@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Retatrutide Tracker</title>
+  <title>GLP-Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -57,9 +57,7 @@
     .setup-desc { font-size: 17px; color: var(--subtext); margin-bottom: 32px; line-height: 1.4; }
 
     /* App Header */
-    .app-header {
-      margin-bottom: 24px;
-    }
+    .app-header { margin-bottom: 24px; }
     .app-title { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
     
     /* Apple Style Cards */
@@ -72,39 +70,31 @@
 
     /* Metrics Grid */
     .metrics-grid { 
-      display: grid; 
-      grid-template-columns: repeat(2, 1fr); 
-      gap: 12px; 
-      margin-bottom: 16px; 
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; 
     }
     .metric-tile {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
+      background: var(--card-bg); border-radius: var(--radius); padding: 16px;
+      display: flex; flex-direction: column;
     }
     .metric-lbl { font-size: 13px; font-weight: 500; color: var(--subtext); margin-bottom: 4px; }
     .metric-val { font-size: 22px; font-weight: 600; letter-spacing: -0.4px; }
     .metric-detail { font-size: 12px; color: var(--subtext); margin-top: 4px; }
 
     /* Chart Area */
-    .section-header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 12px; 
-    }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .section-title { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
     .legend { font-size: 12px; font-weight: 500; color: var(--subtext); }
     .chart-box { height: 220px; width: 100%; }
     
-    /* Inputs */
-    .input-grid { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 10px; margin-bottom: 16px; }
+    /* Inputs - Smartphone optimiert */
+    .input-grid { 
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; 
+    }
     .input-wrapper { display: flex; flex-direction: column; }
+    .date-wrap { grid-column: span 2; } 
     .input-wrapper label { font-size: 12px; font-weight: 500; color: var(--subtext); margin-bottom: 6px; margin-left: 4px; }
     
-    .ios-input {
+    .ios-input, .ios-select {
       width: 100%; height: 44px;
       background: var(--input-bg);
       border: none; border-radius: 10px;
@@ -113,11 +103,14 @@
       user-select: text; outline: none;
       transition: background 0.2s;
     }
-    .ios-input:focus { background: #3A3A3C; }
+    .ios-select { appearance: none; -webkit-appearance: none; cursor: pointer; }
+    .ios-input:focus, .ios-select:focus { background: #3A3A3C; }
 
     /* Buttons */
+    .btn-group { display: flex; gap: 10px; }
+    
     .ios-btn {
-      width: 100%; height: 50px;
+      flex: 1; height: 50px;
       background: var(--blue);
       border: none; border-radius: 12px; 
       color: #FFF; font-size: 17px; font-weight: 600; 
@@ -125,6 +118,10 @@
       transition: opacity 0.2s, transform 0.1s;
     }
     .ios-btn:active { transform: scale(0.98); opacity: 0.8; }
+    
+    .ios-btn-secondary {
+      background: var(--input-bg); color: var(--text);
+    }
 
     /* Scrollable Dose Selector */
     .dose-scroll {
@@ -132,11 +129,9 @@
       -webkit-overflow-scrolling: touch; scrollbar-width: none;
     }
     .dose-scroll::-webkit-scrollbar { display: none; }
-    
     .dose-chip {
       padding: 10px 18px; flex-shrink: 0;
-      background: var(--input-bg);
-      border-radius: 20px;
+      background: var(--input-bg); border-radius: 20px;
       font-size: 15px; font-weight: 500; color: var(--text); cursor: pointer;
       transition: background 0.2s;
     }
@@ -145,15 +140,22 @@
     /* History List */
     .history-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 0; border-bottom: 1px solid var(--separator);
+      padding: 16px 0; border-bottom: 1px solid var(--separator);
     }
     .history-item:last-child { border-bottom: none; }
     .history-main { font-size: 17px; font-weight: 600; }
-    .history-sub { font-size: 13px; color: var(--subtext); margin-top: 2px; }
+    .history-sub { font-size: 13px; color: var(--subtext); margin-top: 4px; }
     
     .pill {
       background: rgba(10, 132, 255, 0.15); color: var(--blue);
       padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: 600;
+    }
+    
+    .action-btns { display: flex; gap: 8px; margin-top: 8px; }
+    .btn-edit {
+      background: rgba(255, 255, 255, 0.1); color: var(--text);
+      border: none; border-radius: 8px; padding: 6px 12px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
     }
     .btn-delete {
       background: rgba(255, 69, 58, 0.15); color: var(--red);
@@ -175,14 +177,21 @@
 </head>
 <body>
 
-  <!-- Toast Notification -->
-  <div id="toast">Eintrag gespeichert</div>
+  <div id="toast">Gespeichert</div>
 
-  <!-- Setup Screen (Wird angezeigt, wenn noch keine Daten da sind) -->
+  <!-- Setup Screen -->
   <div id="setupScreen">
     <h1 class="setup-title">Willkommen</h1>
-    <p class="setup-desc">Bitte trage dein aktuelles Gewicht ein, um mit dem Tracking zu beginnen.</p>
+    <p class="setup-desc">Richte dein Tracking ein, um die Halbwertszeit korrekt zu berechnen.</p>
     
+    <div style="margin-bottom: 16px;">
+      <label style="font-size: 13px; color: var(--subtext); margin-bottom: 6px; display:block;">Wirkstoff</label>
+      <select id="setupMed" class="ios-select">
+        <option value="6">Retatrutide (HWZ: ~6 Tage)</option>
+        <option value="7">Semaglutide / Ozempic (HWZ: ~7 Tage)</option>
+        <option value="5">Tirzepatide / Mounjaro (HWZ: ~5 Tage)</option>
+      </select>
+    </div>
     <div style="margin-bottom: 16px;">
       <label style="font-size: 13px; color: var(--subtext); margin-bottom: 6px; display:block;">Startdatum</label>
       <input type="date" id="setupDate" class="ios-input">
@@ -199,7 +208,20 @@
   <div id="appContent" style="display: none;">
     
     <div class="app-header">
-      <h1 class="app-title">Übersicht</h1>
+      <!-- NEUER NAME HIER -->
+      <h1 class="app-title">GLP-Tracker</h1>
+    </div>
+
+    <!-- Wirkstoff Settings Card -->
+    <div class="ios-card" style="padding: 12px 18px;">
+      <div class="input-wrapper">
+        <label>Aktueller Wirkstoff (für Berechnung)</label>
+        <select id="mainMedSelect" class="ios-select" onchange="updateMedication()">
+          <option value="6">Retatrutide (HWZ: ~6 Tage)</option>
+          <option value="7">Semaglutide / Ozempic (HWZ: ~7 Tage)</option>
+          <option value="5">Tirzepatide / Mounjaro (HWZ: ~5 Tage)</option>
+        </select>
+      </div>
     </div>
 
     <!-- Metriken -->
@@ -215,7 +237,7 @@
         <div class="metric-detail" id="startWt">Start: -- kg</div>
       </div>
       <div class="metric-tile" style="grid-column: span 2;">
-        <div class="metric-lbl">Wirkstoff im Blut (HWZ ~6 Tage)</div>
+        <div class="metric-lbl" id="hwzLabel">Wirkstoff im Blut</div>
         <div class="metric-val" id="serumVal" style="color: var(--orange);">-- mg</div>
         <div class="metric-detail" id="serumPeakInfo">--</div>
       </div>
@@ -235,22 +257,23 @@
       </div>
     </div>
 
-    <!-- Eingabe Karte -->
-    <div class="ios-card">
-      <div class="section-title" style="margin-bottom: 16px;">Neuer Eintrag</div>
+    <!-- Eingabe / Bearbeiten Karte -->
+    <div class="ios-card" id="formCard">
+      <div class="section-title" id="formTitle" style="margin-bottom: 16px;">Neuer Eintrag</div>
       
       <div class="dose-scroll">
-        <div class="dose-chip" onclick="selectChip(0, this)">Keine Dosis</div>
+        <div class="dose-chip" onclick="selectChip(0, this)">0 mg</div>
         <div class="dose-chip" onclick="selectChip(1.0, this)">1.0 mg</div>
-        <div class="dose-chip" onclick="selectChip(2.0, this)">2.0 mg</div>
+        <div class="dose-chip" onclick="selectChip(2.5, this)">2.5 mg</div>
         <div class="dose-chip" onclick="selectChip(4.0, this)">4.0 mg</div>
-        <div class="dose-chip" onclick="selectChip(6.0, this)">6.0 mg</div>
-        <div class="dose-chip" onclick="selectChip(9.0, this)">9.0 mg</div>
+        <div class="dose-chip" onclick="selectChip(5.0, this)">5.0 mg</div>
+        <div class="dose-chip" onclick="selectChip(7.5, this)">7.5 mg</div>
+        <div class="dose-chip" onclick="selectChip(10.0, this)">10.0 mg</div>
         <div class="dose-chip" onclick="selectChip(12.0, this)">12.0 mg</div>
       </div>
 
       <div class="input-grid">
-        <div class="input-wrapper">
+        <div class="input-wrapper date-wrap">
           <label>Datum</label>
           <input type="date" id="dateInput" class="ios-input">
         </div>
@@ -264,7 +287,10 @@
         </div>
       </div>
 
-      <button class="ios-btn" onclick="saveLogEntry()">Speichern</button>
+      <div class="btn-group">
+        <button id="cancelBtn" class="ios-btn ios-btn-secondary" style="display:none;" onclick="cancelEdit()">Abbrechen</button>
+        <button id="submitBtn" class="ios-btn" onclick="saveLogEntry()">Speichern</button>
+      </div>
     </div>
 
     <!-- Historie Karte -->
@@ -276,12 +302,15 @@
   </div>
 
   <script>
-    const HALF_LIFE_DAYS = 6;
-    const STORAGE_KEY = 'retatrutide_data_v1';
+    const STORAGE_KEY = 'peptide_data_v2';
+    const CONFIG_KEY = 'peptide_config_v1';
+    
     let logs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    let config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || { halfLife: 6 }; 
     let chartInstance = null;
+    let editingIndex = null; // Speichert, ob wir gerade bearbeiten
 
-    // Start-Logik prüfen
+    // Init App
     function initApp() {
       if (logs.length === 0) {
         document.getElementById('setupScreen').style.display = 'flex';
@@ -289,19 +318,21 @@
       } else {
         document.getElementById('appContent').style.display = 'block';
         document.getElementById('dateInput').valueAsDate = new Date();
+        document.getElementById('mainMedSelect').value = config.halfLife;
         renderUI();
       }
     }
 
-    // Setup Speichern (Startgewicht)
+    // Setup & Settings
     function saveSetup() {
       const date = document.getElementById('setupDate').value;
       const weight = parseFloat(document.getElementById('setupWeight').value);
+      const hwz = parseInt(document.getElementById('setupMed').value);
 
-      if (!date || isNaN(weight)) {
-        alert("Bitte fülle beide Felder aus.");
-        return;
-      }
+      if (!date || isNaN(weight)) return alert("Bitte Datum und Gewicht ausfüllen.");
+
+      config.halfLife = hwz;
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
 
       logs.push({ date: date, weight: weight, dose: 0 });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
@@ -309,6 +340,15 @@
       document.getElementById('setupScreen').style.display = 'none';
       document.getElementById('appContent').style.display = 'block';
       document.getElementById('dateInput').valueAsDate = new Date();
+      document.getElementById('mainMedSelect').value = hwz;
+      
+      renderUI();
+    }
+
+    function updateMedication() {
+      config.halfLife = parseInt(document.getElementById('mainMedSelect').value);
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+      showToast("Wirkstoff aktualisiert");
       renderUI();
     }
 
@@ -317,7 +357,7 @@
       const toast = document.getElementById('toast');
       toast.innerText = text;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
+      setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
     function selectChip(val, el) {
@@ -330,13 +370,14 @@
       document.querySelectorAll('.dose-chip').forEach(c => c.classList.remove('active'));
     }
 
-    // Halbwertszeit-Berechnung (Kumulation)
+    // Halbwertszeit Berechnung
     function getDoseContributionAt(targetDateStr, doseDateStr, doseMg) {
       const daysPassed = (new Date(targetDateStr) - new Date(doseDateStr)) / (1000 * 60 * 60 * 24);
       if (daysPassed < 0) return 0;
       
-      const ke = Math.LN2 / HALF_LIFE_DAYS;
-      const ka = 1.2;
+      // Nutzt die eingestellte Halbwertszeit aus der Config
+      const ke = Math.LN2 / config.halfLife;
+      const ka = 1.2; // Absorptionsrate (variiert minimal, aber 1.2 ist ein solider Standardwert)
       const normFactor = 1.35;
       return doseMg * normFactor * (Math.exp(-ke * daysPassed) - Math.exp(-ka * daysPassed));
     }
@@ -349,7 +390,38 @@
       return total;
     }
 
-    // Haupt-Eintrag speichern
+    // Bearbeitungs-Modus
+    function editLogEntry(index) {
+      editingIndex = index;
+      const log = logs[index];
+      
+      document.getElementById('dateInput').value = log.date;
+      document.getElementById('weightInput').value = log.weight !== null ? log.weight : '';
+      document.getElementById('doseInput').value = log.dose > 0 ? log.dose : '';
+      resetChips();
+
+      // UI auf Bearbeiten umstellen
+      document.getElementById('formTitle').innerText = "Eintrag bearbeiten";
+      document.getElementById('submitBtn').innerText = "Aktualisieren";
+      document.getElementById('cancelBtn').style.display = 'block';
+      
+      // Zum Formular scrollen
+      document.getElementById('formCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function cancelEdit() {
+      editingIndex = null;
+      document.getElementById('dateInput').valueAsDate = new Date();
+      document.getElementById('weightInput').value = '';
+      document.getElementById('doseInput').value = '';
+      resetChips();
+      
+      document.getElementById('formTitle').innerText = "Neuer Eintrag";
+      document.getElementById('submitBtn').innerText = "Speichern";
+      document.getElementById('cancelBtn').style.display = 'none';
+    }
+
+    // Speichern / Aktualisieren
     function saveLogEntry() {
       const date = document.getElementById('dateInput').value;
       const weight = parseFloat(document.getElementById('weightInput').value);
@@ -358,14 +430,23 @@
       if (!date) return alert('Bitte Datum angeben.');
       if (isNaN(weight) && dose === 0) return showToast("Nichts einzutragen");
 
-      logs.push({ date, weight: isNaN(weight) ? null : weight, dose });
+      const entry = { date, weight: isNaN(weight) ? null : weight, dose };
+
+      if (editingIndex !== null) {
+        logs[editingIndex] = entry; // Überschreiben
+        showToast("Eintrag aktualisiert");
+        cancelEdit(); // UI zurücksetzen
+      } else {
+        logs.push(entry); // Neu anlegen
+        showToast("Eintrag gespeichert");
+        
+        // Felder leeren bei Neuanlage
+        document.getElementById('weightInput').value = '';
+        document.getElementById('doseInput').value = '';
+        resetChips();
+      }
+
       logs.sort((a,b) => new Date(a.date) - new Date(b.date));
-
-      document.getElementById('weightInput').value = '';
-      document.getElementById('doseInput').value = '';
-      resetChips();
-
-      showToast("Eintrag gespeichert");
       renderUI();
     }
 
@@ -373,7 +454,6 @@
       if (confirm("Eintrag wirklich löschen?")) {
         logs.splice(index, 1);
         if (logs.length === 0) {
-            // Falls alles gelöscht wird, zurück zum Setup
             document.getElementById('appContent').style.display = 'none';
             initApp();
             return;
@@ -383,10 +463,13 @@
       }
     }
 
+    // UI Rendern
     function renderUI() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
 
-      // Metriken aktualisieren
+      // Label anpassen
+      document.getElementById('hwzLabel').innerText = `Blutspiegel (HWZ ~${config.halfLife}T)`;
+
       const weights = logs.filter(l => l.weight !== null);
       if (weights.length > 0) {
         const start = weights[0].weight;
@@ -397,12 +480,10 @@
         document.getElementById('startWt').innerText = 'Start: ' + start + ' kg';
         document.getElementById('diffWt').innerText = (diff > 0 ? '+' : '') + diff + ' kg';
         
-        // Formatierung des Datums für die deutsche Anzeige
         const lastDateObj = new Date(weights[weights.length - 1].date);
         document.getElementById('lastWeightDate').innerText = 'Stand: ' + lastDateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
       }
 
-      // Blutspiegel heute
       const todayStr = new Date().toISOString().split('T')[0];
       const activeSerum = calculateSerum(todayStr);
       document.getElementById('serumVal').innerText = activeSerum.toFixed(2) + ' mg';
@@ -431,7 +512,7 @@
       if (logs.length > 0) {
         const startDate = new Date(logs[0].date);
         const endDate = new Date();
-        endDate.setDate(endDate.getDate() + 7); // 7 Tage in die Zukunft für Prognose
+        endDate.setDate(endDate.getDate() + 7); 
 
         for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
           const dateStr = d.toISOString().split('T')[0];
@@ -483,20 +564,14 @@
           interaction: { mode: 'index', intersect: false },
           plugins: { legend: { display: false } },
           scales: {
-            x: { 
-              grid: { display: false }, 
-              ticks: { color: '#8E8E93', maxTicksLimit: 7 } 
-            },
+            x: { grid: { display: false }, ticks: { color: '#8E8E93', maxTicksLimit: 7 } },
             yWeight: {
               type: 'linear', position: 'left',
-              grid: { color: '#38383A' },
-              ticks: { color: '#0A84FF' }
+              grid: { color: '#38383A' }, ticks: { color: '#0A84FF' }
             },
             ySerum: {
               type: 'linear', position: 'right',
-              grid: { display: false },
-              ticks: { color: '#FF9F0A' },
-              min: 0
+              grid: { display: false }, ticks: { color: '#FF9F0A' }, min: 0
             }
           }
         }
@@ -511,20 +586,20 @@
         
         return `
           <div class="history-item">
-            <div>
-              <div class="history-main">${l.weight ? l.weight + ' kg' : 'Nur Dosis'}</div>
+            <div style="flex: 1;">
+              <div class="history-main">${l.weight ? l.weight + ' kg' : 'Dosis-Eintrag'} ${l.dose > 0 ? `<span class="pill" style="margin-left:6px;">${l.dose} mg</span>` : ''}</div>
               <div class="history-sub">${displayDate}</div>
-            </div>
-            <div style="display:flex; align-items:center; gap:12px;">
-              ${l.dose > 0 ? `<span class="pill">${l.dose} mg</span>` : ''}
-              <button class="btn-delete" onclick="deleteLogEntry(${actualIndex})">Löschen</button>
+              
+              <div class="action-btns">
+                <button class="btn-edit" onclick="editLogEntry(${actualIndex})">Bearbeiten</button>
+                <button class="btn-delete" onclick="deleteLogEntry(${actualIndex})">Löschen</button>
+              </div>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    // App Starten
     initApp();
   </script>
 </body>
