@@ -2,7 +2,6 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <!-- Wichtig: user-scalable=no und viewport-fit=cover für das echte App-Gefühl ohne Zoom-Bugs -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -10,7 +9,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      /* Apple iOS Dark Mode Colors */
       --bg: #000000;
       --surface: #1C1C1E;
       --surface-elevated: #2C2C2E;
@@ -19,163 +17,143 @@
       --orange: #FF9F0A;
       --red: #FF453A;
       --green: #32D74B;
-      --text-main: #FFFFFF;
-      --text-sub: #8E8E93;
+      --text: #FFFFFF;
+      --subtext: #8E8E93;
     }
 
-    * { 
-      -webkit-tap-highlight-color: transparent; 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
-      background: var(--bg);
-      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      background: var(--bg); color: var(--text);
+      padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 40px) 16px;
+      max-width: 540px; margin: 0 auto;
       -webkit-font-smoothing: antialiased;
-      /* Safe Area für Notch & Home-Indikator */
-      padding: calc(env(safe-area-inset-top) + 24px) 16px calc(env(safe-area-inset-bottom) + 40px) 16px;
-      max-width: 600px;
-      margin: 0 auto;
     }
 
-    h1, h2, h3 { font-weight: 700; letter-spacing: -0.04em; }
-
-    /* ===== NATIVE APP HEADER ===== */
-    .app-header { margin-bottom: 24px; padding: 0 4px; }
-    .app-title { font-size: 34px; line-height: 1.1; }
-
-    /* ===== SETUP SCREEN (APPLE ONBOARDING STYLE) ===== */
+    /* ===== SETUP / ONBOARDING SCREEN ===== */
     #setupScreen {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: var(--bg);
+      position: fixed; inset: 0; background: var(--bg);
       display: none; flex-direction: column; justify-content: space-between;
-      padding: calc(env(safe-area-inset-top) + 60px) 24px calc(env(safe-area-inset-bottom) + 30px) 24px;
-      z-index: 1000;
+      padding: calc(env(safe-area-inset-top) + 40px) 24px calc(env(safe-area-inset-bottom) + 30px) 24px;
+      z-index: 2000;
     }
-    .setup-header { text-align: center; margin-bottom: 40px; }
-    .setup-icon { font-size: 64px; margin-bottom: 16px; display: block; }
-    .setup-title { font-size: 32px; margin-bottom: 12px; }
-    .setup-desc { font-size: 17px; color: var(--text-sub); line-height: 1.4; }
+    .setup-header { text-align: center; margin-top: 20px; }
+    .setup-icon { font-size: 56px; margin-bottom: 16px; display: block; }
+    .setup-title { font-size: 32px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.03em; }
+    .setup-desc { font-size: 16px; color: var(--subtext); line-height: 1.4; }
 
-    /* ===== IOS LIST FORMS (EINSTELLUNGEN-STYLE) ===== */
-    .ios-list {
+    /* ===== NATIVE HEADER ===== */
+    .header { font-size: 34px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 20px; }
+    .section-title { font-size: 13px; text-transform: uppercase; color: var(--subtext); margin: 24px 0 8px 16px; font-weight: 600; letter-spacing: 0.04em; }
+
+    /* ===== IOS INSET GROUPED LISTS ===== */
+    .ios-group {
       background: var(--surface);
       border-radius: 12px;
       overflow: hidden;
-      margin-bottom: 24px;
     }
-    .ios-list-item {
+    .ios-row {
       display: flex; justify-content: space-between; align-items: center;
       padding: 14px 16px;
       border-bottom: 0.5px solid var(--separator);
       font-size: 17px;
     }
-    .ios-list-item:last-child { border-bottom: none; }
-    .ios-list-label { color: var(--text-main); font-weight: 400; }
+    .ios-row:last-child { border-bottom: none; }
     
-    /* Inputs in Lists */
-    .ios-input-right {
-      text-align: right;
-      background: transparent;
-      border: none; outline: none;
-      color: var(--blue); /* Blau signalisiert: Hier tippen */
-      font-size: 17px; font-family: inherit;
-      width: 60%;
+    .ios-input {
+      text-align: right; font-size: 17px; color: var(--blue);
+      background: transparent; border: none; outline: none; width: 60%;
+      font-family: inherit;
     }
-    .ios-input-right::placeholder { color: #555; }
+    .ios-input::placeholder { color: #444; }
     
-    /* Native Select überlagern */
-    .select-wrapper { position: relative; color: var(--blue); }
-    .ios-select-right {
+    .ios-select {
       appearance: none; -webkit-appearance: none;
-      background: transparent; border: none; outline: none;
-      color: var(--blue); font-size: 17px; text-align: right; direction: rtl;
-      width: 100%; font-family: inherit;
+      background: transparent; border: none; color: var(--blue);
+      font-size: 17px; text-align: right; direction: rtl; width: 100%; outline: none;
+      font-family: inherit; cursor: pointer;
     }
 
-    /* ===== SECTION HEADERS ===== */
-    .section-title {
-      font-size: 13px; text-transform: uppercase; color: var(--text-sub);
-      font-weight: 600; letter-spacing: 0.05em; margin: 0 0 8px 16px;
+    /* ===== HEALTH METRICS CARDS ===== */
+    .health-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .health-card {
+      background: var(--surface); border-radius: 14px; padding: 16px;
+    }
+    .hc-title { font-size: 14px; font-weight: 600; color: var(--subtext); display: flex; align-items: center; gap: 6px; }
+    .hc-val { font-size: 26px; font-weight: 700; margin-top: 8px; letter-spacing: -0.02em; }
+    .hc-sub { font-size: 12px; color: var(--subtext); margin-top: 4px; }
+
+    /* ===== BUTTONS & ANIMATIONS ===== */
+    .btn-primary {
+      width: 100%; padding: 16px; border-radius: 14px;
+      background: var(--blue); color: #FFF; border: none;
+      font-size: 17px; font-weight: 600; cursor: pointer;
+      transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.15s;
+      margin-top: 16px; display: block; text-align: center;
+    }
+    .btn-primary:active { transform: scale(0.97); opacity: 0.8; }
+
+    .btn-calc {
+      background: rgba(10, 132, 255, 0.15);
+      color: var(--blue); margin-top: 0; margin-bottom: 20px;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
     }
 
-    /* ===== METRICS (HEALTH WIDGET STYLE) ===== */
-    .metrics-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;
+    .row-btn {
+      color: var(--blue); font-size: 15px; font-weight: 500;
+      background: none; border: none; cursor: pointer; padding: 4px;
     }
-    .metric-card {
-      background: var(--surface); border-radius: 16px; padding: 16px;
-    }
-    .metric-card.large { grid-column: span 2; }
-    .m-title { font-size: 14px; font-weight: 600; color: var(--text-sub); display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
-    .m-val { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
-    .m-sub { font-size: 13px; color: var(--text-sub); margin-top: 2px; }
+    .row-btn.red { color: var(--red); }
 
-    /* ===== BUTTONS ===== */
-    .ios-btn {
-      width: 100%; height: 50px;
-      background: var(--blue); border: none; border-radius: 14px;
-      color: #FFF; font-size: 17px; font-weight: 600;
-      transition: transform 0.1s, opacity 0.2s;
+    /* ===== BOTTOM SHEET MODAL (CALCULATOR) ===== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      z-index: 1000; display: none; opacity: 0; transition: opacity 0.3s ease;
+      align-items: flex-end; justify-content: center;
     }
-    .ios-btn:active { transform: scale(0.97); opacity: 0.8; }
-    .ios-btn.secondary { background: var(--surface-elevated); color: var(--blue); }
-    .btn-row { display: flex; gap: 12px; margin-top: 16px; padding: 0 4px; }
+    .modal-sheet {
+      width: 100%; max-width: 540px;
+      background: var(--surface); border-radius: 24px 24px 0 0;
+      padding: 12px 20px calc(env(safe-area-inset-bottom) + 30px) 20px;
+      transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    }
+    .drag-indicator {
+      width: 36px; height: 5px; background: #555;
+      border-radius: 3px; margin: 0 auto 16px auto;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .modal-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+    .btn-close { color: var(--subtext); background: var(--surface-elevated); border: none; border-radius: 50%; width: 32px; height: 32px; font-weight: 600; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-    /* ===== DOSE CHIPS (SCROLLABLE) ===== */
-    .chip-scroll {
-      display: flex; gap: 8px; overflow-x: auto; padding: 0 4px 12px 4px;
-      -webkit-overflow-scrolling: touch; scrollbar-width: none; margin-top: 8px;
+    .result-box {
+      background: rgba(10, 132, 255, 0.12); border: 1px solid rgba(10, 132, 255, 0.25);
+      border-radius: 14px; padding: 18px; text-align: center; margin-top: 20px;
     }
-    .chip-scroll::-webkit-scrollbar { display: none; }
-    .chip {
-      background: var(--surface); color: var(--text-main);
-      padding: 10px 16px; border-radius: 20px; font-size: 15px; font-weight: 500;
-      white-space: nowrap; transition: background 0.2s;
-    }
-    .chip.active { background: var(--text-main); color: var(--bg); font-weight: 600; }
+    .result-val { font-size: 34px; font-weight: 700; color: var(--blue); margin: 6px 0 2px 0; letter-spacing: -0.02em; }
 
-    /* ===== CHART ===== */
-    .chart-container {
-      background: var(--surface); border-radius: 16px; padding: 16px; margin-bottom: 24px;
-      height: 240px; position: relative;
+    /* ===== CHART CONTAINER ===== */
+    .chart-container { 
+      background: var(--surface); border-radius: 14px; padding: 16px; 
+      height: 240px; margin-bottom: 8px; position: relative; 
     }
 
-    /* ===== HISTORY FEED ===== */
-    .history-card {
-      background: var(--surface); border-radius: 16px; padding: 0 16px; margin-bottom: 24px;
-    }
-    .history-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 0; border-bottom: 0.5px solid var(--separator);
-    }
-    .history-item:last-child { border-bottom: none; }
-    .h-main { font-size: 17px; font-weight: 600; }
-    .h-sub { font-size: 14px; color: var(--text-sub); margin-top: 4px; }
-    .h-pill {
-      background: rgba(10, 132, 255, 0.15); color: var(--blue);
-      padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 600;
-    }
-    .action-icons { display: flex; gap: 12px; }
-    .action-icon {
-      width: 32px; height: 32px; border-radius: 16px;
-      display: flex; justify-content: center; align-items: center;
-      background: var(--surface-elevated); font-size: 14px;
-    }
-    .edit-icon { color: var(--blue); }
-    .del-icon { color: var(--red); background: rgba(255, 69, 58, 0.15); }
+    /* ===== HISTORY ===== */
+    .history-item { align-items: center; padding: 14px 16px; }
+    .h-info { display: flex; flex-direction: column; gap: 3px; }
+    .h-title { font-size: 17px; font-weight: 600; }
+    .h-date { font-size: 13px; color: var(--subtext); }
+    .h-actions { display: flex; gap: 12px; }
 
-    /* ===== NATIVE TOAST (DYNAMIC ISLAND STYLE) ===== */
+    /* ===== TOAST (DYNAMIC ISLAND STYLE) ===== */
     #toast {
-      position: fixed; top: 16px; left: 50%; transform: translate(-50%, -100%);
-      background: rgba(30, 30, 30, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      color: #FFF; padding: 12px 24px; border-radius: 99px;
-      font-size: 15px; font-weight: 600;
-      opacity: 0; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s;
-      z-index: 9999; display: flex; align-items: center; gap: 8px;
+      position: fixed; top: 16px; left: 50%; transform: translate(-50%, -150%);
+      background: rgba(40, 40, 40, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      color: #FFF; padding: 10px 20px; border-radius: 99px; font-size: 14px; font-weight: 600;
+      opacity: 0; transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 9999;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px;
     }
     #toast.show { transform: translate(-50%, 0); opacity: 1; }
   </style>
@@ -183,9 +161,9 @@
 <body>
 
   <!-- Nativer Toast -->
-  <div id="toast"><span>✅</span> <span id="toastMsg">Gespeichert</span></div>
+  <div id="toast">✅ <span id="toastMsg">Gespeichert</span></div>
 
-  <!-- Setup Screen (Onboarding) -->
+  <!-- ONBOARDING SETUP SCREEN -->
   <div id="setupScreen">
     <div>
       <div class="setup-header">
@@ -194,63 +172,66 @@
         <p class="setup-desc">Richte dein Profil ein, um Blutspiegel und Gewicht exakt zu berechnen.</p>
       </div>
 
-      <div class="ios-list">
-        <div class="ios-list-item">
-          <span class="ios-list-label">Wirkstoff</span>
-          <div class="select-wrapper" style="width: 60%;">
-            <select id="setupMed" class="ios-select-right">
+      <div class="section-title">Konfiguration</div>
+      <div class="ios-group" style="margin-top: 8px;">
+        <div class="ios-row">
+          <span>Wirkstoff (HWZ)</span>
+          <div style="width: 55%;">
+            <select id="setupMed" class="ios-select">
               <option value="6">Retatrutide (~6 Tage)</option>
               <option value="7">Semaglutide (~7 Tage)</option>
               <option value="5">Tirzepatide (~5 Tage)</option>
             </select>
           </div>
         </div>
-        <div class="ios-list-item">
-          <span class="ios-list-label">Startdatum</span>
-          <input type="date" id="setupDate" class="ios-input-right">
+        <div class="ios-row">
+          <span>Startdatum</span>
+          <input type="date" id="setupDate" class="ios-input">
         </div>
-        <div class="ios-list-item">
-          <span class="ios-list-label">Gewicht</span>
-          <input type="number" step="0.1" id="setupWeight" class="ios-input-right" placeholder="kg" inputmode="decimal">
+        <div class="ios-row">
+          <span>Startgewicht</span>
+          <input type="number" step="0.1" id="setupWeight" class="ios-input" placeholder="z.B. 120.5" inputmode="decimal">
         </div>
       </div>
     </div>
-    <button class="ios-btn" onclick="saveSetup()">Weiter</button>
+    <button class="btn-primary" onclick="saveSetup()">Tracking starten</button>
   </div>
 
-  <!-- Main App Content -->
+  <!-- HAUPT-APP -->
   <div id="appContent" style="display: none;">
-    
-    <div class="app-header">
-      <h1 class="app-title">Übersicht</h1>
-    </div>
+    <h1 class="header">Übersicht</h1>
 
-    <!-- Metriken (Health Style) -->
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="m-title"><span style="color:var(--blue)">⚖️</span> Aktuell</div>
-        <div class="m-val" id="currWt">-- kg</div>
-        <div class="m-sub" id="diffWt">-- kg seit Start</div>
+    <!-- HEALTH METRICS -->
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="hc-title"><span>⚖️</span> Gewicht</div>
+        <div class="hc-val" id="currWt">--</div>
+        <div class="hc-sub" id="diffWt">-- seit Start</div>
       </div>
-      <div class="metric-card">
-        <div class="m-title"><span style="color:var(--orange)">🩸</span> Serum</div>
-        <div class="m-val" id="serumVal">-- mg</div>
-        <div class="m-sub" id="hwzLabel">HWZ: -- Tage</div>
+      <div class="health-card">
+        <div class="hc-title"><span>🩸</span> Blutspiegel</div>
+        <div class="hc-val" id="serumVal" style="color: var(--orange)">--</div>
+        <div class="hc-sub" id="hwzLabel">HWZ: --</div>
       </div>
     </div>
 
-    <!-- Chart -->
+    <!-- RECHNER BUTTON -->
+    <button class="btn-primary btn-calc" onclick="openCalc()">
+      💉 Spritzen- & Rekonstitutionsrechner
+    </button>
+
+    <!-- CHART -->
     <div class="chart-container">
       <canvas id="heroChart"></canvas>
     </div>
 
-    <!-- Settings Block -->
+    <!-- EINSTELLUNGEN WIRKSTOFF -->
     <div class="section-title">Medikation</div>
-    <div class="ios-list">
-      <div class="ios-list-item">
-        <span class="ios-list-label">Wirkstoff</span>
-        <div class="select-wrapper" style="width: 60%;">
-          <select id="mainMedSelect" class="ios-select-right" onchange="updateMedication()">
+    <div class="ios-group">
+      <div class="ios-row">
+        <span>Aktiver Wirkstoff</span>
+        <div style="width: 55%;">
+          <select id="mainMedSelect" class="ios-select" onchange="updateMedication()">
             <option value="6">Retatrutide (~6 Tage)</option>
             <option value="7">Semaglutide (~7 Tage)</option>
             <option value="5">Tirzepatide (~5 Tage)</option>
@@ -259,50 +240,72 @@
       </div>
     </div>
 
-    <!-- Neuer Eintrag / Edit Formular -->
-    <div class="section-title" id="formTitle">Neuer Eintrag</div>
+    <!-- NEUER EINTRAG FORMULAR -->
+    <div class="section-title" id="formTitle">Eintrag hinzufügen</div>
+    <div class="ios-group">
+      <div class="ios-row">
+        <span>Datum</span>
+        <input type="date" id="dateInput" class="ios-input">
+      </div>
+      <div class="ios-row">
+        <span>Gewicht (optional)</span>
+        <input type="number" step="0.1" id="weightInput" class="ios-input" placeholder="kg" inputmode="decimal">
+      </div>
+      <div class="ios-row">
+        <span>Dosis (optional)</span>
+        <input type="number" step="0.1" id="doseInput" class="ios-input" placeholder="mg" inputmode="decimal">
+      </div>
+    </div>
     
-    <div class="chip-scroll">
-      <div class="chip" onclick="selectChip(0, this)">0 mg</div>
-      <div class="chip" onclick="selectChip(1.0, this)">1.0 mg</div>
-      <div class="chip" onclick="selectChip(2.5, this)">2.5 mg</div>
-      <div class="chip" onclick="selectChip(4.0, this)">4.0 mg</div>
-      <div class="chip" onclick="selectChip(5.0, this)">5.0 mg</div>
-      <div class="chip" onclick="selectChip(7.5, this)">7.5 mg</div>
-      <div class="chip" onclick="selectChip(10.0, this)">10.0 mg</div>
-      <div class="chip" onclick="selectChip(12.0, this)">12.0 mg</div>
-    </div>
+    <button id="submitBtn" class="btn-primary" onclick="saveLogEntry()">Eintrag sichern</button>
+    <button id="cancelBtn" class="btn-primary" style="display:none; background: var(--surface-elevated); color: var(--blue);" onclick="cancelEdit()">Abbrechen</button>
 
-    <div class="ios-list" id="formCard">
-      <div class="ios-list-item">
-        <span class="ios-list-label">Datum</span>
-        <input type="date" id="dateInput" class="ios-input-right">
-      </div>
-      <div class="ios-list-item">
-        <span class="ios-list-label">Gewicht</span>
-        <input type="number" step="0.1" id="weightInput" class="ios-input-right" placeholder="0.0 kg" inputmode="decimal">
-      </div>
-      <div class="ios-list-item">
-        <span class="ios-list-label">Dosis</span>
-        <input type="number" step="0.1" id="doseInput" class="ios-input-right" placeholder="0.0 mg" inputmode="decimal" oninput="resetChips()">
-      </div>
-    </div>
-
-    <div class="btn-row">
-      <button id="cancelBtn" class="ios-btn secondary" style="display:none;" onclick="cancelEdit()">Abbrechen</button>
-      <button id="submitBtn" class="ios-btn" onclick="saveLogEntry()">Speichern</button>
-    </div>
-
-    <!-- Verlauf -->
-    <div class="section-title" style="margin-top: 32px;">Verlauf</div>
-    <div class="history-card" id="historyFeed"></div>
-
+    <!-- HISTORIE -->
+    <div class="section-title">Historie</div>
+    <div class="ios-group" id="historyFeed"></div>
   </div>
 
+
+  <!-- MODAL: SPRITZEN RECHNER -->
+  <div class="modal-overlay" id="calcModal" onclick="closeCalc(event)">
+    <div class="modal-sheet" id="calcSheet">
+      <div class="drag-indicator"></div>
+      <div class="modal-header">
+        <h2 class="modal-title">Spritzen-Rechner</h2>
+        <button class="btn-close" onclick="forceCloseCalc()">✕</button>
+      </div>
+
+      <p style="font-size: 14px; color: var(--subtext); margin-bottom: 16px; line-height: 1.4;">
+        Berechne die Einheiten (Units) für eine Standard U-100 Spritze (1 ml = 100 Units).
+      </p>
+
+      <div class="ios-group">
+        <div class="ios-row">
+          <span>Vial Inhalt (mg)</span>
+          <input type="number" id="calcVial" class="ios-input" placeholder="z.B. 10" oninput="runCalc()" inputmode="decimal">
+        </div>
+        <div class="ios-row">
+          <span>Bac Wasser (ml)</span>
+          <input type="number" id="calcBac" class="ios-input" placeholder="z.B. 1" oninput="runCalc()" inputmode="decimal">
+        </div>
+        <div class="ios-row">
+          <span>Wunschdosis (mg)</span>
+          <input type="number" id="calcDose" class="ios-input" placeholder="z.B. 2.5" oninput="runCalc()" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div style="font-size: 12px; color: var(--subtext); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Aufzuziehen bis Strich:</div>
+        <div class="result-val" id="calcResultUnits">-- Units</div>
+        <div style="font-size: 14px; color: var(--subtext); margin-top: 2px;" id="calcResultMl">( entspricht -- ml )</div>
+      </div>
+    </div>
+  </div>
+
+
   <script>
-    // System Variablen
-    const STORAGE_KEY = 'glptracker_data_v3';
-    const CONFIG_KEY = 'glptracker_config_v2';
+    const STORAGE_KEY = 'glptracker_data_v5';
+    const CONFIG_KEY = 'glptracker_config_v5';
     
     let logs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || { halfLife: 6 }; 
@@ -327,7 +330,7 @@
       const hwz = parseInt(document.getElementById('setupMed').value);
 
       if (!date || isNaN(weight)) {
-        showToast("Bitte alles ausfüllen", "⚠️");
+        showToast("Bitte Datum und Startgewicht angeben", "⚠️");
         return;
       }
 
@@ -343,34 +346,69 @@
       document.getElementById('mainMedSelect').value = hwz;
       
       renderUI();
+      showToast("Profil eingerichtet", "🎉");
+    }
+
+    // --- RECHNER MODAL ---
+    function openCalc() {
+      const modal = document.getElementById('calcModal');
+      const sheet = document.getElementById('calcSheet');
+      modal.style.display = 'flex';
+      setTimeout(() => {
+        modal.style.opacity = '1';
+        sheet.style.transform = 'translateY(0)';
+      }, 10);
+    }
+
+    function closeCalc(e) {
+      if(e.target.id === 'calcModal') forceCloseCalc();
+    }
+    
+    function forceCloseCalc() {
+      const modal = document.getElementById('calcModal');
+      const sheet = document.getElementById('calcSheet');
+      sheet.style.transform = 'translateY(100%)';
+      modal.style.opacity = '0';
+      setTimeout(() => { modal.style.display = 'none'; }, 300);
+    }
+
+    function runCalc() {
+      const vial = parseFloat(document.getElementById('calcVial').value);
+      const bac = parseFloat(document.getElementById('calcBac').value);
+      const dose = parseFloat(document.getElementById('calcDose').value);
+
+      const resUnits = document.getElementById('calcResultUnits');
+      const resMl = document.getElementById('calcResultMl');
+
+      if(vial > 0 && bac > 0 && dose > 0) {
+        const concentration = vial / bac; // mg per ml
+        const requiredMl = dose / concentration;
+        const requiredUnits = requiredMl * 100; // U-100 syringe
+
+        resUnits.innerText = `${Math.round(requiredUnits)} Units`;
+        resMl.innerText = `( entspricht ${requiredMl.toFixed(2)} ml )`;
+      } else {
+        resUnits.innerText = `-- Units`;
+        resMl.innerText = `( entspricht -- ml )`;
+      }
+    }
+
+    // --- TOAST ---
+    function showToast(text, icon = "✅") {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = `${icon} <span id="toastMsg">${text}</span>`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
     function updateMedication() {
       config.halfLife = parseInt(document.getElementById('mainMedSelect').value);
       localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
       renderUI();
-      showToast("Wirkstoff geändert", "🧬");
+      showToast("Wirkstoff aktualisiert", "🧬");
     }
 
-    // UI Feedback
-    function showToast(text, icon = "✅") {
-      const toast = document.getElementById('toast');
-      toast.innerHTML = `<span>${icon}</span> <span>${text}</span>`;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
-    }
-
-    function selectChip(val, el) {
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-      document.getElementById('doseInput').value = val > 0 ? val : '';
-    }
-
-    function resetChips() {
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    }
-
-    // Berechnungslogik (Kumulation)
+    // --- BERECHNUNG ---
     function getDoseContributionAt(targetDateStr, doseDateStr, doseMg) {
       const daysPassed = (new Date(targetDateStr) - new Date(doseDateStr)) / (1000 * 60 * 60 * 24);
       if (daysPassed < 0) return 0;
@@ -383,13 +421,11 @@
 
     function calculateSerum(targetDateStr) {
       let total = 0;
-      logs.forEach(l => {
-        if (l.dose > 0) total += getDoseContributionAt(targetDateStr, l.date, l.dose);
-      });
+      logs.forEach(l => { if (l.dose > 0) total += getDoseContributionAt(targetDateStr, l.date, l.dose); });
       return total;
     }
 
-    // Formular Aktionen
+    // --- FORMULAR ---
     function editLogEntry(index) {
       editingIndex = index;
       const log = logs[index];
@@ -397,13 +433,12 @@
       document.getElementById('dateInput').value = log.date;
       document.getElementById('weightInput').value = log.weight !== null ? log.weight : '';
       document.getElementById('doseInput').value = log.dose > 0 ? log.dose : '';
-      resetChips();
 
       document.getElementById('formTitle').innerText = "Eintrag bearbeiten";
-      document.getElementById('submitBtn').innerText = "Aktualisieren";
+      document.getElementById('submitBtn').innerText = "Änderungen sichern";
       document.getElementById('cancelBtn').style.display = 'block';
       
-      document.getElementById('formTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: 350, behavior: 'smooth' });
     }
 
     function cancelEdit() {
@@ -411,10 +446,9 @@
       document.getElementById('dateInput').valueAsDate = new Date();
       document.getElementById('weightInput').value = '';
       document.getElementById('doseInput').value = '';
-      resetChips();
       
-      document.getElementById('formTitle').innerText = "Neuer Eintrag";
-      document.getElementById('submitBtn').innerText = "Speichern";
+      document.getElementById('formTitle').innerText = "Eintrag hinzufügen";
+      document.getElementById('submitBtn').innerText = "Eintrag sichern";
       document.getElementById('cancelBtn').style.display = 'none';
     }
 
@@ -423,8 +457,8 @@
       const weight = parseFloat(document.getElementById('weightInput').value);
       const dose = parseFloat(document.getElementById('doseInput').value) || 0;
 
-      if (!date) return showToast("Datum fehlt", "⚠️");
-      if (isNaN(weight) && dose === 0) return showToast("Bitte Wert eintragen", "⚠️");
+      if (!date) return showToast("Bitte Datum angeben", "⚠️");
+      if (isNaN(weight) && dose === 0) return showToast("Bitte Gewicht oder Dosis eintragen", "⚠️");
 
       const entry = { date, weight: isNaN(weight) ? null : weight, dose };
 
@@ -434,10 +468,9 @@
         cancelEdit(); 
       } else {
         logs.push(entry);
-        showToast("Gespeichert", "✅");
+        showToast("Eintrag gespeichert", "✅");
         document.getElementById('weightInput').value = '';
         document.getElementById('doseInput').value = '';
-        resetChips();
       }
 
       logs.sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -448,20 +481,19 @@
       if (confirm("Eintrag wirklich löschen?")) {
         logs.splice(index, 1);
         if (logs.length === 0) {
-            document.getElementById('appContent').style.display = 'none';
-            initApp();
-            return;
+          document.getElementById('appContent').style.display = 'none';
+          initApp();
+          return;
         }
-        showToast("Gelöscht", "🗑️");
+        showToast("Eintrag gelöscht", "🗑️");
         renderUI();
       }
     }
 
-    // UI Updates
+    // --- RENDERING ---
     function renderUI() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-
-      document.getElementById('hwzLabel').innerText = `Berechnet (HWZ ${config.halfLife} Tage)`;
+      document.getElementById('hwzLabel').innerText = `HWZ: ${config.halfLife} Tage`;
 
       const weights = logs.filter(l => l.weight !== null);
       if (weights.length > 0) {
@@ -471,6 +503,9 @@
 
         document.getElementById('currWt').innerText = current.toFixed(1) + ' kg';
         document.getElementById('diffWt').innerText = (diff > 0 ? '+' : '') + diff + ' kg seit Start';
+      } else {
+        document.getElementById('currWt').innerText = '--';
+        document.getElementById('diffWt').innerText = '--';
       }
 
       const todayStr = new Date().toISOString().split('T')[0];
@@ -485,82 +520,41 @@
       const ctx = document.getElementById('heroChart').getContext('2d');
       if (chartInstance) chartInstance.destroy();
 
-      let labels = [];
-      let weightData = [];
-      let serumData = [];
-
+      let labels = []; let weightData = []; let serumData = [];
       if (logs.length > 0) {
         const startDate = new Date(logs[0].date);
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() + 7); 
+        const endDate = new Date(); endDate.setDate(endDate.getDate() + 7); 
 
         for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
           const dateStr = d.toISOString().split('T')[0];
           labels.push(d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }));
-
           const log = logs.find(l => l.date === dateStr && l.weight !== null);
           weightData.push(log ? log.weight : null);
           serumData.push(calculateSerum(dateStr).toFixed(2));
         }
       }
 
-      const orangeGradient = ctx.createLinearGradient(0, 0, 0, 240);
-      orangeGradient.addColorStop(0, 'rgba(255, 159, 10, 0.3)');
-      orangeGradient.addColorStop(1, 'rgba(255, 159, 10, 0)');
+      const gradient = ctx.createLinearGradient(0, 0, 0, 240);
+      gradient.addColorStop(0, 'rgba(255, 159, 10, 0.35)');
+      gradient.addColorStop(1, 'rgba(255, 159, 10, 0)');
 
       chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels,
           datasets: [
-            {
-              label: 'Gewicht',
-              data: weightData,
-              borderColor: '#0A84FF',
-              backgroundColor: '#0A84FF',
-              borderWidth: 3,
-              tension: 0.4,
-              spanGaps: true,
-              yAxisID: 'yWeight',
-              pointRadius: 3,
-              pointBackgroundColor: '#0A84FF'
-            },
-            {
-              label: 'Blutspiegel',
-              data: serumData,
-              borderColor: '#FF9F0A',
-              backgroundColor: orangeGradient,
-              borderWidth: 2,
-              fill: true,
-              tension: 0.4,
-              yAxisID: 'ySerum',
-              pointRadius: 0
-            }
+            { label: 'Gewicht', data: weightData, borderColor: '#0A84FF', borderWidth: 3, tension: 0.4, spanGaps: true, yAxisID: 'yWeight', pointRadius: 3, pointBackgroundColor: '#0A84FF' },
+            { label: 'Serum', data: serumData, borderColor: '#FF9F0A', backgroundColor: gradient, borderWidth: 2, fill: true, tension: 0.4, yAxisID: 'ySerum', pointRadius: 0 }
           ]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           plugins: { legend: { display: false } },
           scales: {
-            x: { 
-              grid: { display: false }, 
-              ticks: { color: '#8E8E93', maxTicksLimit: 6, font: {size: 11} } 
-            },
-            yWeight: {
-              type: 'linear', position: 'left',
-              grid: { color: '#38383A', drawBorder: false }, 
-              ticks: { color: '#0A84FF', font: {size: 11, weight: '600'} },
-              border: { display: false }
-            },
-            ySerum: {
-              type: 'linear', position: 'right',
-              grid: { display: false }, 
-              ticks: { color: '#FF9F0A', font: {size: 11, weight: '600'} }, 
-              min: 0,
-              border: { display: false }
-            }
+            x: { grid: { display: false }, ticks: { color: '#8E8E93', maxTicksLimit: 6, font: {size: 11} } },
+            yWeight: { type: 'linear', position: 'left', grid: { color: '#38383A' }, ticks: { color: '#0A84FF' }, border: { display: false } },
+            ySerum: { type: 'linear', position: 'right', grid: { display: false }, ticks: { color: '#FF9F0A' }, min: 0, border: { display: false } }
           },
           layout: { padding: { left: 0, right: 0, top: 10, bottom: 0 } }
         }
@@ -568,40 +562,36 @@
     }
 
     function renderFeed() {
-      const reversedLogs = [...logs].reverse();
-      const feedContainer = document.getElementById('historyFeed');
-      
-      if(reversedLogs.length === 0) {
-          feedContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-sub);">Noch keine Einträge vorhanden.</div>`;
-          return;
+      const feed = document.getElementById('historyFeed');
+      if(logs.length === 0) {
+        feed.innerHTML = `<div style="padding: 16px; text-align: center; color: var(--subtext);">Keine Einträge vorhanden.</div>`;
+        return;
       }
-
-      feedContainer.innerHTML = reversedLogs.map((l, revIndex) => {
+      const reversedLogs = [...logs].reverse();
+      feed.innerHTML = reversedLogs.map((l, revIndex) => {
         const actualIndex = logs.length - 1 - revIndex;
         const dateObj = new Date(l.date);
-        const dayName = dateObj.toLocaleDateString('de-DE', { weekday: 'short' });
-        const dateStr = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const dateStr = dateObj.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
+        
+        let parts = [];
+        if(l.weight !== null) parts.push(`${l.weight.toFixed(1)} kg`);
+        if(l.dose > 0) parts.push(`<span style="color:var(--blue)">${l.dose} mg Injektion</span>`);
         
         return `
-          <div class="history-item">
-            <div style="flex: 1;">
-              <div class="h-main">
-                ${l.weight ? l.weight.toFixed(1) + ' kg' : 'Injektion'}
-                ${l.dose > 0 ? `<span class="h-pill" style="margin-left:8px;">${l.dose} mg</span>` : ''}
-              </div>
-              <div class="h-sub">${dayName}, ${dateStr}</div>
+          <div class="ios-row history-item">
+            <div class="h-info">
+              <div class="h-title">${parts.join(' • ') || 'Eintrag'}</div>
+              <div class="h-date">${dateStr}</div>
             </div>
-            
-            <div class="action-icons">
-              <div class="action-icon edit-icon" onclick="editLogEntry(${actualIndex})">✏️</div>
-              <div class="action-icon del-icon" onclick="deleteLogEntry(${actualIndex})">🗑</div>
+            <div class="h-actions">
+              <button class="row-btn" onclick="editLogEntry(${actualIndex})">Bearbeiten</button>
+              <button class="row-btn red" onclick="deleteLogEntry(${actualIndex})">Löschen</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    // App Starten
     initApp();
   </script>
 </body>
