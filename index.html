@@ -14,9 +14,10 @@
       --surface-elevated: rgba(44, 44, 46, 0.9);
       --separator: rgba(255, 255, 255, 0.12);
       
-      --accent-primary: #30D158; /* Mint / Emerald */
-      --accent-gold: #FFD60A;    /* Warm Amber / Gold */
-      --accent-purple: #BF5AF2;  /* Apple Purple */
+      /* Frische, edle Pastellfarben */
+      --accent-primary: #34D399; /* Frisches Pastell-Mint */
+      --accent-gold: #FCD34D;    /* Sanftes Pastell-Gold / Amber */
+      --accent-purple: #C084FC;  /* Elegantes Pastell-Lavender */
       
       --text-main: #FFFFFF;
       --text-sub: #8E8E93;
@@ -120,11 +121,13 @@
       direction: rtl;
     }
     
+    /* Perfekte Rechtsbündigkeit für das Datumsfeld */
     input[type="date"].ios-input {
       appearance: none;
       -webkit-appearance: none;
       direction: ltr;
       text-align: right;
+      width: 100%;
     }
 
     .ios-input::placeholder { color: #555; }
@@ -137,9 +140,9 @@
       font-size: 17px; font-weight: 700; cursor: pointer;
       transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, opacity 0.2s ease;
       margin-top: 16px; display: block; text-align: center;
-      box-shadow: 0 8px 25px rgba(48, 209, 88, 0.3);
+      box-shadow: 0 8px 25px rgba(52, 211, 153, 0.2);
     }
-    .btn-main:hover { box-shadow: 0 12px 32px rgba(48, 209, 88, 0.4); }
+    .btn-main:hover { box-shadow: 0 12px 32px rgba(52, 211, 153, 0.3); }
     .btn-main:active { transform: scale(0.97); opacity: 0.85; }
 
     .btn-secondary {
@@ -151,11 +154,11 @@
     .row-btn {
       color: var(--accent-primary); font-size: 15px; font-weight: 600;
       background: none; border: none; cursor: pointer; padding: 6px 10px;
-      border-radius: 8px; background: rgba(48, 209, 88, 0.12);
+      border-radius: 8px; background: rgba(52, 211, 153, 0.1);
       transition: transform 0.15s ease, background 0.15s ease;
     }
     .row-btn:active { transform: scale(0.93); }
-    .row-btn.red { color: #FF453A; background: rgba(255, 69, 58, 0.12); }
+    .row-btn.red { color: #F87171; background: rgba(248, 113, 113, 0.1); }
 
     /* ===== CHART CONTAINER ===== */
     .chart-box { 
@@ -393,8 +396,8 @@
 
 
   <script>
-    const STORAGE_KEY = 'glptracker_data_v13';
-    const CONFIG_KEY = 'glptracker_config_v13';
+    const STORAGE_KEY = 'glptracker_data_v14';
+    const CONFIG_KEY = 'glptracker_config_v14';
     
     let logs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || { halfLife: 6 }; 
@@ -601,16 +604,16 @@
       }
 
       const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-      gradient.addColorStop(0, 'rgba(255, 214, 10, 0.35)');
-      gradient.addColorStop(1, 'rgba(255, 214, 10, 0)');
+      gradient.addColorStop(0, 'rgba(252, 211, 77, 0.25)');
+      gradient.addColorStop(1, 'rgba(252, 211, 77, 0)');
 
       chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels,
           datasets: [
-            { label: 'Gewicht', data: weightData, borderColor: '#30D158', borderWidth: 3, tension: 0.4, spanGaps: true, yAxisID: 'yWeight', pointRadius: 3, pointBackgroundColor: '#30D158' },
-            { label: 'Serum', data: serumData, borderColor: '#FFD60A', backgroundColor: gradient, borderWidth: 2, fill: true, tension: 0.4, yAxisID: 'ySerum', pointRadius: 0 }
+            { label: 'Gewicht', data: weightData, borderColor: '#34D399', borderWidth: 3, tension: 0.4, spanGaps: true, yAxisID: 'yWeight', pointRadius: 3, pointBackgroundColor: '#34D399' },
+            { label: 'Serum', data: serumData, borderColor: '#FCD34D', backgroundColor: gradient, borderWidth: 2, fill: true, tension: 0.4, yAxisID: 'ySerum', pointRadius: 0 }
           ]
         },
         options: {
@@ -619,8 +622,8 @@
           plugins: { legend: { display: false } },
           scales: {
             x: { grid: { display: false }, ticks: { color: '#8E8E93', maxTicksLimit: 6, font: {size: 11} } },
-            yWeight: { type: 'linear', position: 'left', grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#30D158' }, border: { display: false } },
-            ySerum: { type: 'linear', position: 'right', grid: { display: false }, ticks: { color: '#FFD60A' }, min: 0, border: { display: false } }
+            yWeight: { type: 'linear', position: 'left', grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#34D399' }, border: { display: false } },
+            ySerum: { type: 'linear', position: 'right', grid: { display: false }, ticks: { color: '#FCD34D' }, min: 0, border: { display: false } }
           },
           layout: { padding: { left: 0, right: 0, top: 10, bottom: 0 } }
         }
