@@ -66,8 +66,6 @@
       box-shadow: 0 12px 40px rgba(0,0,0,0.5);
       position: relative; overflow: hidden;
     }
-
-    /* Heavy Accent Bars on Cards */
     .liquid-card::before {
       content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
       background: var(--accent-indigo);
@@ -77,7 +75,9 @@
 
     /* ===== METRICS GRID ===== */
     .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-    .metric-val { font-size: 28px; font-weight: 700; margin-top: 6px; letter-spacing: -0.02em; }
+    .metric-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-sub); }
+    .metric-header svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.2; fill: none; }
+    .metric-val { font-size: 28px; font-weight: 700; margin-top: 8px; letter-spacing: -0.02em; }
     .metric-sub { font-size: 13px; color: var(--text-sub); margin-top: 4px; font-weight: 500; }
 
     /* ===== IOS FORMS & INPUTS ===== */
@@ -102,6 +102,14 @@
       background: transparent; border: none; outline: none; width: 55%;
       font-family: inherit; direction: rtl;
     }
+    /* Spezifische Korrektur für native Datumsfelder (kein Mittig-Hängen mehr) */
+    input[type="date"].ios-input {
+      appearance: none;
+      -webkit-appearance: none;
+      direction: ltr;
+      text-align: right;
+    }
+
     .ios-input::placeholder { color: #555; }
     .ios-select { cursor: pointer; }
 
@@ -154,7 +162,7 @@
       transition: color 0.2s;
     }
     .tab-item.active { color: var(--accent-cyan); }
-    .tab-icon { font-size: 20px; font-weight: 700; line-height: 1; }
+    .tab-icon svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
 
     /* ===== TOAST NOTIFICATION ===== */
     #toast {
@@ -225,12 +233,18 @@
       
       <div class="metrics-grid">
         <div class="liquid-card cyan">
-          <div class="metric-sub">Aktuelles Gewicht</div>
+          <div class="metric-header">
+            <svg viewBox="0 0 24 24"><path d="M12 3v18M3 7h18M5 7l-2 10h18L19 7"/></svg>
+            <span>Gewicht</span>
+          </div>
           <div class="metric-val" id="currWt">--</div>
           <div class="metric-sub" id="diffWt" style="color: var(--accent-cyan);">-- seit Start</div>
         </div>
         <div class="liquid-card orange">
-          <div class="metric-sub">Aktiver Blutspiegel</div>
+          <div class="metric-header">
+            <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            <span>Blutspiegel</span>
+          </div>
           <div class="metric-val" id="serumVal" style="color: var(--accent-orange);">--</div>
           <div class="metric-sub" id="hwzLabel">HWZ: --</div>
         </div>
@@ -293,37 +307,36 @@
         
         <div class="liquid-card" style="margin-bottom: 20px;">
           <p style="font-size: 15px; color: var(--text-sub); line-height: 1.5;">
-            Berechne exakt, wie viele Striche (Units) du auf einer Standard U-100 Insulinspritze oder einer ml-Spritze aufziehen musst.
+            Wähle das Fassungsvermögen deiner Spritze (z.B. 1 ml, 0.5 ml oder 0.3 ml). Der Rechner ermittelt exakt die Milliliter und die Skaleneinheiten (Units) für U-100 Insulin-Spritzen.
           </p>
         </div>
 
         <div class="ios-list" style="margin-bottom: 20px;">
           <div class="ios-row">
-            <span>Spritzentyp</span>
-            <select id="calcSyringeType" class="ios-select" onchange="runCalc()">
-              <option value="100">U-100 (1 ml = 100 Striche)</option>
-              <option value="50">U-100 (0.5 ml = 50 Striche)</option>
-              <option value="30">U-100 (0.3 ml = 30 Striche)</option>
-              <option value="ml">Standard ml-Spritze</option>
+            <span>Spritzen-Größe (Volumen)</span>
+            <select id="calcSyringeSize" class="ios-select" onchange="runCalc()">
+              <option value="1.0">1.0 ml (100 Einheiten Skala)</option>
+              <option value="0.5">0.5 ml (50 Einheiten Skala)</option>
+              <option value="0.3">0.3 ml (30 Einheiten Skala)</option>
             </select>
           </div>
           <div class="ios-row">
-            <span>Vial Inhalt</span>
-            <input type="number" id="calcVial" class="ios-input" placeholder="z.B. 10 mg" oninput="runCalc()" inputmode="decimal">
+            <span>Vial Inhalt (mg)</span>
+            <input type="number" id="calcVial" class="ios-input" placeholder="z.B. 10" oninput="runCalc()" inputmode="decimal">
           </div>
           <div class="ios-row">
-            <span>Bac-Wasser hinzugefügt</span>
-            <input type="number" id="calcBac" class="ios-input" placeholder="z.B. 1 ml" oninput="runCalc()" inputmode="decimal">
+            <span>Bac-Wasser hinzugefügt (ml)</span>
+            <input type="number" id="calcBac" class="ios-input" placeholder="z.B. 1" oninput="runCalc()" inputmode="decimal">
           </div>
           <div class="ios-row">
-            <span>Gewünschte Dosis</span>
-            <input type="number" id="calcDose" class="ios-input" placeholder="z.B. 2.5 mg" oninput="runCalc()" inputmode="decimal">
+            <span>Gewünschte Dosis (mg)</span>
+            <input type="number" id="calcDose" class="ios-input" placeholder="z.B. 2.5" oninput="runCalc()" inputmode="decimal">
           </div>
         </div>
 
         <div class="liquid-card cyan" style="text-align: center; padding: 24px;">
-          <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-sub); letter-spacing: 0.08em;">Exaktes Ergebnis</div>
-          <div id="calcResultMain" style="font-size: 36px; font-weight: 700; color: var(--accent-cyan); margin: 8px 0 4px 0;">-- Units</div>
+          <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-sub); letter-spacing: 0.08em;">Exaktes Aufziehergebnis</div>
+          <div id="calcResultMain" style="font-size: 36px; font-weight: 700; color: var(--accent-cyan); margin: 8px 0 4px 0;">-- ml</div>
           <div id="calcResultSub" style="font-size: 14px; color: var(--text-sub);">Trage alle Parameter oben ein</div>
         </div>
       </div>
@@ -335,23 +348,29 @@
   <!-- NATIVE IOS BOTTOM TAB BAR -->
   <div class="tab-bar" id="bottomTabBar" style="display: none;">
     <div class="tab-item active" onclick="switchTab('dashboard', this)">
-      <div class="tab-icon">📊</div>
+      <div class="tab-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg>
+      </div>
       <div>Übersicht</div>
     </div>
     <div class="tab-item" onclick="switchTab('history', this)">
-      <div class="tab-icon">📋</div>
+      <div class="tab-icon">
+        <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      </div>
       <div>Logbuch</div>
     </div>
     <div class="tab-item" onclick="switchTab('calculator', this)">
-      <div class="tab-icon">💉</div>
+      <div class="tab-icon">
+        <svg viewBox="0 0 24 24"><path d="M18 2l4 4M17 7l-5 5M3 21l3-3 7-7 3 3-7 7-3 3z"/><path d="M14.5 9.5l2 2"/></svg>
+      </div>
       <div>Rechner</div>
     </div>
   </div>
 
 
   <script>
-    const STORAGE_KEY = 'glptracker_data_v7';
-    const CONFIG_KEY = 'glptracker_config_v7';
+    const STORAGE_KEY = 'glptracker_data_v9';
+    const CONFIG_KEY = 'glptracker_config_v9';
     
     let logs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || { halfLife: 6 }; 
@@ -411,6 +430,7 @@
         subtitle.innerText = "Dashboard";
         title.innerText = "Übersicht";
         document.getElementById('viewDashboard').classList.add('active');
+        renderChart();
       } else if(tabName === 'history') {
         subtitle.innerText = "Historie";
         title.innerText = "Logbuch";
@@ -425,30 +445,34 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // --- SPRITZEN RECHNER ---
+    // --- KORREKTER SPRITZEN RECHNER ---
     function runCalc() {
-      const type = document.getElementById('calcSyringeType').value;
-      const vial = parseFloat(document.getElementById('calcVial').value);
-      const bac = parseFloat(document.getElementById('calcBac').value);
-      const dose = parseFloat(document.getElementById('calcDose').value);
+      const syringeSize = parseFloat(document.getElementById('calcSyringeSize').value); // z.B. 1.0, 0.5, 0.3 ml
+      const vial = parseFloat(document.getElementById('calcVial').value); // mg im Vial
+      const bac = parseFloat(document.getElementById('calcBac').value); // ml Bac-Wasser
+      const dose = parseFloat(document.getElementById('calcDose').value); // gewünschte mg Dosis
 
       const resMain = document.getElementById('calcResultMain');
       const resSub = document.getElementById('calcResultSub');
 
       if(vial > 0 && bac > 0 && dose > 0) {
-        const concentration = vial / bac; // mg per ml
+        // Konzentration: mg pro ml Flüssigkeit
+        const concentration = vial / bac; 
+        // Benötigtes Volumen in ml für die gewünschte Dosis
         const mlNeeded = dose / concentration;
+        
+        // Bei U-100 entsprechen 1 ml genau 100 Einheiten (Units) auf der Skala
+        const units = mlNeeded * 100;
 
-        if(type === 'ml') {
-          resMain.innerText = `${mlNeeded.toFixed(2)} ml`;
-          resSub.innerText = `( entspricht ${mlNeeded * 100} Strichen auf der Skala )`;
+        if (mlNeeded > syringeSize) {
+          resMain.innerText = `Zu viel Volumen!`;
+          resSub.innerText = `Benötigt ${mlNeeded.toFixed(2)} ml, aber Spritze fasst nur ${syringeSize} ml. Nimm eine größere Spritze oder mehr Vial-Konzentration.`;
         } else {
-          const units = mlNeeded * 100;
-          resMain.innerText = `${Math.round(units)} Units (Striche)`;
-          resSub.innerText = `( entspricht ${mlNeeded.toFixed(2)} ml auf der Spritze )`;
+          resMain.innerText = `${mlNeeded.toFixed(2)} ml  (${Math.round(units)} Units)`;
+          resSub.innerText = `Aufzuziehen auf deiner ${syringeSize} ml Spritze (Skalen-Einheiten)`;
         }
       } else {
-        resMain.innerText = `-- Units`;
+        resMain.innerText = `-- ml`;
         resSub.innerText = `Trage alle Parameter oben ein`;
       }
     }
