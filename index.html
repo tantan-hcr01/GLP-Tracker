@@ -5,263 +5,319 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Retatrutide OS</title>
+  <title>Retatrutide Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
+      /* Apple iOS Dark Mode Palette */
       --bg: #000000;
-      --card-bg: rgba(22, 22, 28, 0.65);
-      --card-border: rgba(255, 255, 255, 0.12);
-      --accent-blue: #0A84FF;
-      --accent-blue-glow: rgba(10, 132, 255, 0.4);
-      --accent-green: #30D158;
-      --accent-green-glow: rgba(48, 209, 88, 0.4);
-      --accent-purple: #BF5AF2;
-      --danger: #FF453A;
+      --card-bg: #1C1C1E;
+      --separator: #38383A;
+      --blue: #0A84FF;
+      --orange: #FF9F0A;
+      --green: #30D158;
+      --red: #FF453A;
       --text: #FFFFFF;
-      --sub: #8E8E93;
-      --radius: 24px;
+      --subtext: #8E8E93;
+      --input-bg: #2C2C2E;
+      --radius: 16px;
     }
 
-    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; user-select: none; }
+    * { 
+      -webkit-tap-highlight-color: transparent; 
+      box-sizing: border-box; 
+      user-select: none; 
+      margin: 0; 
+      padding: 0;
+    }
 
     body {
-      margin: 0;
-      padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 36px) 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
       background: var(--bg);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
+      padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 40px) 16px;
+      max-width: 600px;
+      margin: 0 auto;
     }
 
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes toastPop {
-      0% { opacity: 0; transform: translate(-50%, 20px) scale(0.9); }
-      15%, 85% { opacity: 1; transform: translate(-50%, 0) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -10px) scale(0.95); }
+    /* Setup Screen Overlay */
+    #setupScreen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      padding: 24px;
+      z-index: 1000;
     }
 
+    .setup-title { font-size: 34px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+    .setup-desc { font-size: 17px; color: var(--subtext); margin-bottom: 32px; line-height: 1.4; }
+
+    /* App Header */
     .app-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 20px; animation: slideDown 0.5s ease;
+      margin-bottom: 24px;
     }
-    .header-sub { font-size: 11px; color: var(--sub); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
-    .app-title { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; margin: 0; background: linear-gradient(180deg, #FFFFFF 0%, #A1A1A6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-    .status-badge {
-      display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px;
-      background: rgba(48, 209, 88, 0.12); border: 1px solid rgba(48, 209, 88, 0.3);
-      color: var(--accent-green); font-size: 11px; font-weight: 700; text-transform: uppercase;
-    }
-
-    .glass-card {
+    .app-title { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
+    
+    /* Apple Style Cards */
+    .ios-card {
       background: var(--card-bg);
-      backdrop-filter: blur(30px) saturate(190%);
-      -webkit-backdrop-filter: blur(30px) saturate(190%);
-      border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 18px;
       margin-bottom: 16px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15);
-      animation: slideDown 0.6s ease;
     }
 
-    .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+    /* Metrics Grid */
+    .metrics-grid { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 12px; 
+      margin-bottom: 16px; 
+    }
     .metric-tile {
-      background: rgba(30, 30, 36, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 18px; padding: 14px 16px;
-      position: relative; overflow: hidden;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
     }
-    .metric-lbl { font-size: 11px; font-weight: 600; color: var(--sub); text-transform: uppercase; }
-    .metric-val { font-size: 24px; font-weight: 800; letter-spacing: -0.6px; margin-top: 4px; }
-    .metric-detail { font-size: 10px; color: var(--sub); margin-top: 2px; }
+    .metric-lbl { font-size: 13px; font-weight: 500; color: var(--subtext); margin-bottom: 4px; }
+    .metric-val { font-size: 22px; font-weight: 600; letter-spacing: -0.4px; }
+    .metric-detail { font-size: 12px; color: var(--subtext); margin-top: 4px; }
 
-    .tile-blue { border-bottom: 2px solid var(--accent-blue); }
-    .tile-green { border-bottom: 2px solid var(--accent-green); }
-    .tile-purple { border-bottom: 2px solid var(--accent-purple); }
+    /* Chart Area */
+    .section-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 12px; 
+    }
+    .section-title { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+    .legend { font-size: 12px; font-weight: 500; color: var(--subtext); }
+    .chart-box { height: 220px; width: 100%; }
+    
+    /* Inputs */
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 10px; margin-bottom: 16px; }
+    .input-wrapper { display: flex; flex-direction: column; }
+    .input-wrapper label { font-size: 12px; font-weight: 500; color: var(--subtext); margin-bottom: 6px; margin-left: 4px; }
+    
+    .ios-input {
+      width: 100%; height: 44px;
+      background: var(--input-bg);
+      border: none; border-radius: 10px;
+      color: var(--text); padding: 0 12px; 
+      font-size: 17px; font-family: inherit;
+      user-select: text; outline: none;
+      transition: background 0.2s;
+    }
+    .ios-input:focus { background: #3A3A3C; }
 
-    .chart-box { position: relative; height: 230px; width: 100%; margin-top: 10px; }
-    .section-title { font-size: 12px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; }
+    /* Buttons */
+    .ios-btn {
+      width: 100%; height: 50px;
+      background: var(--blue);
+      border: none; border-radius: 12px; 
+      color: #FFF; font-size: 17px; font-weight: 600; 
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .ios-btn:active { transform: scale(0.98); opacity: 0.8; }
 
+    /* Scrollable Dose Selector */
     .dose-scroll {
-      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px;
+      display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px;
       -webkit-overflow-scrolling: touch; scrollbar-width: none;
     }
     .dose-scroll::-webkit-scrollbar { display: none; }
     
     .dose-chip {
-      min-width: 68px; flex-shrink: 0;
-      background: rgba(44, 44, 50, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px; padding: 12px 0;
-      text-align: center; font-size: 14px; font-weight: 700; color: #FFF; cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      padding: 10px 18px; flex-shrink: 0;
+      background: var(--input-bg);
+      border-radius: 20px;
+      font-size: 15px; font-weight: 500; color: var(--text); cursor: pointer;
+      transition: background 0.2s;
     }
-    .dose-chip.active {
-      background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
-      border-color: rgba(255,255,255,0.4);
-      box-shadow: 0 6px 20px var(--accent-blue-glow);
-      transform: translateY(-2px);
-    }
+    .dose-chip.active { background: var(--text); color: var(--bg); font-weight: 600; }
 
-    .input-grid { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px; margin-bottom: 14px; }
-    .input-wrapper { display: flex; flex-direction: column; }
-    .input-wrapper label { font-size: 10px; font-weight: 700; color: var(--sub); text-transform: uppercase; margin-bottom: 4px; margin-left: 2px; }
-
-    .input-styled {
-      width: 100%; height: 48px; background: rgba(35, 35, 42, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px;
-      color: #FFF; padding: 0 12px; font-size: 16px; font-family: inherit; outline: none;
-      user-select: text;
-    }
-    .input-styled:focus { border-color: var(--accent-blue); box-shadow: 0 0 12px var(--accent-blue-glow); }
-
-    .btn-submit {
-      width: 100%; height: 54px;
-      background: linear-gradient(135deg, #30D158 0%, #10B981 100%);
-      border: none; border-radius: 18px; color: #000;
-      font-size: 17px; font-weight: 800; cursor: pointer;
-      box-shadow: 0 6px 25px var(--accent-green-glow);
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .btn-submit:active { transform: scale(0.96); }
-
+    /* History List */
     .history-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 12px 0; border-bottom: 1px solid var(--separator);
     }
     .history-item:last-child { border-bottom: none; }
+    .history-main { font-size: 17px; font-weight: 600; }
+    .history-sub { font-size: 13px; color: var(--subtext); margin-top: 2px; }
     
-    .pill-dose-tag {
-      background: rgba(10, 132, 255, 0.15); border: 1px solid rgba(10, 132, 255, 0.3);
-      color: var(--accent-blue); padding: 4px 10px; border-radius: 10px; font-size: 12px; font-weight: 700;
+    .pill {
+      background: rgba(10, 132, 255, 0.15); color: var(--blue);
+      padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: 600;
     }
-
     .btn-delete {
-      background: rgba(255, 69, 58, 0.15); border: 1px solid rgba(255, 69, 58, 0.3);
-      color: var(--danger); border-radius: 10px; padding: 6px 10px;
-      font-size: 12px; font-weight: 700; cursor: pointer;
-      transition: transform 0.1s ease;
+      background: rgba(255, 69, 58, 0.15); color: var(--red);
+      border: none; border-radius: 8px; padding: 6px 12px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
     }
-    .btn-delete:active { transform: scale(0.9); }
 
+    /* Minimal Toast */
     #toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.95); color: #000;
-      padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 700;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; z-index: 9999; pointer-events: none;
+      position: fixed; top: 40px; left: 50%; transform: translateX(-50%) translateY(-20px);
+      background: #333333; color: #FFF;
+      padding: 12px 24px; border-radius: 24px; font-size: 15px; font-weight: 500;
+      opacity: 0; pointer-events: none; z-index: 9999;
+      transition: opacity 0.3s, transform 0.3s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
-
-    .info-banner {
-      background: rgba(191, 90, 242, 0.08); border: 1px solid rgba(191, 90, 242, 0.2);
-      border-radius: 14px; padding: 10px 12px; font-size: 11px; color: #E5D4F3; margin-top: 10px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
-  <div id="toast">Eintrag gespeichert ✨</div>
+  <!-- Toast Notification -->
+  <div id="toast">Eintrag gespeichert</div>
 
-  <div class="app-header">
-    <div>
-      <span class="header-sub">Peptid Protocol</span>
-      <h1 class="app-title">Retatrutide OS</h1>
-    </div>
-    <div class="status-badge">Active</div>
-  </div>
-
-  <div class="metrics-grid">
-    <div class="metric-tile tile-blue">
-      <div class="metric-lbl">Start (02.08.26)</div>
-      <div class="metric-val" id="startWt">123.4 kg</div>
-      <div class="metric-detail">Basisgewicht</div>
-    </div>
-    <div class="metric-tile tile-blue">
-      <div class="metric-lbl">Aktuell</div>
-      <div class="metric-val" style="color:var(--accent-blue)" id="currWt">-- kg</div>
-      <div class="metric-detail" id="lastWeightDate">Keine Daten</div>
-    </div>
-    <div class="metric-tile tile-green">
-      <div class="metric-lbl">Gesamtabnahme</div>
-      <div class="metric-val" style="color:var(--accent-green)" id="diffWt">-- kg</div>
-      <div class="metric-detail">Verlauf gesamt</div>
-    </div>
-    <div class="metric-tile tile-purple">
-      <div class="metric-lbl">Wirkstoff im Blut</div>
-      <div class="metric-val" style="color:var(--accent-purple)" id="serumVal">-- mg</div>
-      <div class="metric-detail" id="serumPeakInfo">HWZ: ~6 Tage</div>
-    </div>
-  </div>
-
-  <div class="glass-card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-      <span class="section-title" style="margin:0;">Verlauf & Kumulation</span>
-      <span style="font-size:11px; font-weight:700; color:var(--accent-green);">● Blutspiegel (mg) <span style="color:var(--accent-blue);">● Gewicht (kg)</span></span>
-    </div>
-    <div class="chart-box">
-      <canvas id="heroChart"></canvas>
-    </div>
-    <div class="info-banner">
-      <span>💡 Grüne Kurve = Aktiver Restspiegel im Körper</span>
-      <span style="font-weight:700;">HWZ 6 Tage</span>
-    </div>
-  </div>
-
-  <div class="glass-card">
-    <div class="section-title">Schnell-Dosis wählen</div>
+  <!-- Setup Screen (Wird angezeigt, wenn noch keine Daten da sind) -->
+  <div id="setupScreen">
+    <h1 class="setup-title">Willkommen</h1>
+    <p class="setup-desc">Bitte trage dein aktuelles Gewicht ein, um mit dem Tracking zu beginnen.</p>
     
-    <div class="dose-scroll">
-      <div class="dose-chip" onclick="selectChip(0, this)">0 mg</div>
-      <div class="dose-chip" onclick="selectChip(1.0, this)">1.0 mg</div>
-      <div class="dose-chip" onclick="selectChip(2.0, this)">2.0 mg</div>
-      <div class="dose-chip" onclick="selectChip(4.0, this)">4.0 mg</div>
-      <div class="dose-chip" onclick="selectChip(6.0, this)">6.0 mg</div>
-      <div class="dose-chip" onclick="selectChip(9.0, this)">9.0 mg</div>
-      <div class="dose-chip" onclick="selectChip(12.0, this)">12.0 mg</div>
+    <div style="margin-bottom: 16px;">
+      <label style="font-size: 13px; color: var(--subtext); margin-bottom: 6px; display:block;">Startdatum</label>
+      <input type="date" id="setupDate" class="ios-input">
     </div>
-
-    <div class="input-grid">
-      <div class="input-wrapper">
-        <label>Gewicht</label>
-        <input type="number" step="0.1" id="weightInput" class="input-styled" placeholder="kg" inputmode="decimal">
-      </div>
-      <div class="input-wrapper">
-        <label>Dosis</label>
-        <input type="number" step="0.1" id="doseInput" class="input-styled" placeholder="mg" inputmode="decimal" oninput="resetChips()">
-      </div>
-      <div class="input-wrapper">
-        <label>Datum</label>
-        <input type="date" id="dateInput" class="input-styled">
-      </div>
+    <div style="margin-bottom: 24px;">
+      <label style="font-size: 13px; color: var(--subtext); margin-bottom: 6px; display:block;">Startgewicht (kg)</label>
+      <input type="number" step="0.1" id="setupWeight" class="ios-input" placeholder="z.B. 95.5" inputmode="decimal">
     </div>
-
-    <button class="btn-submit" onclick="saveLogEntry()">Eintrag Speichern</button>
+    
+    <button class="ios-btn" onclick="saveSetup()">Tracking starten</button>
   </div>
 
-  <div class="glass-card">
-    <div class="section-title">Logbuch Historie</div>
-    <div id="historyFeed"></div>
+  <!-- Main App Content -->
+  <div id="appContent" style="display: none;">
+    
+    <div class="app-header">
+      <h1 class="app-title">Übersicht</h1>
+    </div>
+
+    <!-- Metriken -->
+    <div class="metrics-grid">
+      <div class="metric-tile">
+        <div class="metric-lbl">Aktuelles Gewicht</div>
+        <div class="metric-val" id="currWt" style="color: var(--blue);">-- kg</div>
+        <div class="metric-detail" id="lastWeightDate">--</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-lbl">Differenz zum Start</div>
+        <div class="metric-val" id="diffWt">-- kg</div>
+        <div class="metric-detail" id="startWt">Start: -- kg</div>
+      </div>
+      <div class="metric-tile" style="grid-column: span 2;">
+        <div class="metric-lbl">Wirkstoff im Blut (HWZ ~6 Tage)</div>
+        <div class="metric-val" id="serumVal" style="color: var(--orange);">-- mg</div>
+        <div class="metric-detail" id="serumPeakInfo">--</div>
+      </div>
+    </div>
+
+    <!-- Chart Karte -->
+    <div class="ios-card">
+      <div class="section-header">
+        <span class="section-title">Verlauf</span>
+        <span class="legend">
+          <span style="color:var(--orange);">● Blutspiegel</span> &nbsp;
+          <span style="color:var(--blue);">● Gewicht</span>
+        </span>
+      </div>
+      <div class="chart-box">
+        <canvas id="heroChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Eingabe Karte -->
+    <div class="ios-card">
+      <div class="section-title" style="margin-bottom: 16px;">Neuer Eintrag</div>
+      
+      <div class="dose-scroll">
+        <div class="dose-chip" onclick="selectChip(0, this)">Keine Dosis</div>
+        <div class="dose-chip" onclick="selectChip(1.0, this)">1.0 mg</div>
+        <div class="dose-chip" onclick="selectChip(2.0, this)">2.0 mg</div>
+        <div class="dose-chip" onclick="selectChip(4.0, this)">4.0 mg</div>
+        <div class="dose-chip" onclick="selectChip(6.0, this)">6.0 mg</div>
+        <div class="dose-chip" onclick="selectChip(9.0, this)">9.0 mg</div>
+        <div class="dose-chip" onclick="selectChip(12.0, this)">12.0 mg</div>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-wrapper">
+          <label>Datum</label>
+          <input type="date" id="dateInput" class="ios-input">
+        </div>
+        <div class="input-wrapper">
+          <label>Gewicht</label>
+          <input type="number" step="0.1" id="weightInput" class="ios-input" placeholder="kg" inputmode="decimal">
+        </div>
+        <div class="input-wrapper">
+          <label>Dosis</label>
+          <input type="number" step="0.1" id="doseInput" class="ios-input" placeholder="mg" inputmode="decimal" oninput="resetChips()">
+        </div>
+      </div>
+
+      <button class="ios-btn" onclick="saveLogEntry()">Speichern</button>
+    </div>
+
+    <!-- Historie Karte -->
+    <div class="ios-card">
+      <div class="section-title" style="margin-bottom: 12px;">Historie</div>
+      <div id="historyFeed"></div>
+    </div>
+
   </div>
 
   <script>
-    document.getElementById('dateInput').valueAsDate = new Date();
-
     const HALF_LIFE_DAYS = 6;
-    const defaultData = [{ date: "2026-08-02", weight: 123.4, dose: 0 }];
-    let logs = JSON.parse(localStorage.getItem('reta_pro_v5')) || defaultData;
+    const STORAGE_KEY = 'retatrutide_data_v1';
+    let logs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let chartInstance = null;
 
-    function triggerToast(text) {
+    // Start-Logik prüfen
+    function initApp() {
+      if (logs.length === 0) {
+        document.getElementById('setupScreen').style.display = 'flex';
+        document.getElementById('setupDate').valueAsDate = new Date();
+      } else {
+        document.getElementById('appContent').style.display = 'block';
+        document.getElementById('dateInput').valueAsDate = new Date();
+        renderUI();
+      }
+    }
+
+    // Setup Speichern (Startgewicht)
+    function saveSetup() {
+      const date = document.getElementById('setupDate').value;
+      const weight = parseFloat(document.getElementById('setupWeight').value);
+
+      if (!date || isNaN(weight)) {
+        alert("Bitte fülle beide Felder aus.");
+        return;
+      }
+
+      logs.push({ date: date, weight: weight, dose: 0 });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+      
+      document.getElementById('setupScreen').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
+      document.getElementById('dateInput').valueAsDate = new Date();
+      renderUI();
+    }
+
+    // UI Tools
+    function showToast(text) {
       const toast = document.getElementById('toast');
       toast.innerText = text;
-      toast.style.display = 'block';
-      toast.style.animation = 'toastPop 2.2s ease forwards';
-      setTimeout(() => { toast.style.display = 'none'; }, 2200);
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
     function selectChip(val, el) {
@@ -274,6 +330,7 @@
       document.querySelectorAll('.dose-chip').forEach(c => c.classList.remove('active'));
     }
 
+    // Halbwertszeit-Berechnung (Kumulation)
     function getDoseContributionAt(targetDateStr, doseDateStr, doseMg) {
       const daysPassed = (new Date(targetDateStr) - new Date(doseDateStr)) / (1000 * 60 * 60 * 24);
       if (daysPassed < 0) return 0;
@@ -287,19 +344,19 @@
     function calculateSerum(targetDateStr) {
       let total = 0;
       logs.forEach(l => {
-        if (l.dose > 0) {
-          total += getDoseContributionAt(targetDateStr, l.date, l.dose);
-        }
+        if (l.dose > 0) total += getDoseContributionAt(targetDateStr, l.date, l.dose);
       });
       return total;
     }
 
+    // Haupt-Eintrag speichern
     function saveLogEntry() {
       const date = document.getElementById('dateInput').value;
       const weight = parseFloat(document.getElementById('weightInput').value);
       const dose = parseFloat(document.getElementById('doseInput').value) || 0;
 
       if (!date) return alert('Bitte Datum angeben.');
+      if (isNaN(weight) && dose === 0) return showToast("Nichts einzutragen");
 
       logs.push({ date, weight: isNaN(weight) ? null : weight, dose });
       logs.sort((a,b) => new Date(a.date) - new Date(b.date));
@@ -308,37 +365,44 @@
       document.getElementById('doseInput').value = '';
       resetChips();
 
-      triggerToast("Eintrag gespeichert ✨");
+      showToast("Eintrag gespeichert");
       renderUI();
     }
 
     function deleteLogEntry(index) {
-      if (confirm("Möchtest du diesen Eintrag wirklich löschen?")) {
+      if (confirm("Eintrag wirklich löschen?")) {
         logs.splice(index, 1);
-        triggerToast("Eintrag gelöscht 🗑️");
+        if (logs.length === 0) {
+            // Falls alles gelöscht wird, zurück zum Setup
+            document.getElementById('appContent').style.display = 'none';
+            initApp();
+            return;
+        }
+        showToast("Gelöscht");
         renderUI();
       }
     }
 
     function renderUI() {
-      localStorage.setItem('reta_pro_v5', JSON.stringify(logs));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
 
+      // Metriken aktualisieren
       const weights = logs.filter(l => l.weight !== null);
       if (weights.length > 0) {
         const start = weights[0].weight;
         const current = weights[weights.length - 1].weight;
         const diff = (current - start).toFixed(1);
 
-        document.getElementById('startWt').innerText = start + ' kg';
         document.getElementById('currWt').innerText = current + ' kg';
+        document.getElementById('startWt').innerText = 'Start: ' + start + ' kg';
         document.getElementById('diffWt').innerText = (diff > 0 ? '+' : '') + diff + ' kg';
-        document.getElementById('lastWeightDate').innerText = 'Stand: ' + weights[weights.length - 1].date.slice(5);
-      } else {
-        document.getElementById('startWt').innerText = '-- kg';
-        document.getElementById('currWt').innerText = '-- kg';
-        document.getElementById('diffWt').innerText = '-- kg';
+        
+        // Formatierung des Datums für die deutsche Anzeige
+        const lastDateObj = new Date(weights[weights.length - 1].date);
+        document.getElementById('lastWeightDate').innerText = 'Stand: ' + lastDateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
       }
 
+      // Blutspiegel heute
       const todayStr = new Date().toISOString().split('T')[0];
       const activeSerum = calculateSerum(todayStr);
       document.getElementById('serumVal').innerText = activeSerum.toFixed(2) + ' mg';
@@ -346,9 +410,10 @@
       const doseLogs = logs.filter(l => l.dose > 0);
       if (doseLogs.length > 0) {
         const lastDose = doseLogs[doseLogs.length - 1];
-        document.getElementById('serumPeakInfo').innerText = `Zuletzt: ${lastDose.dose}mg (${lastDose.date.slice(5)})`;
+        const lastDoseDate = new Date(lastDose.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+        document.getElementById('serumPeakInfo').innerText = `Zuletzt: ${lastDose.dose}mg am ${lastDoseDate}`;
       } else {
-        document.getElementById('serumPeakInfo').innerText = 'HWZ: ~6 Tage';
+        document.getElementById('serumPeakInfo').innerText = 'Bisher keine Dosis eingetragen';
       }
 
       renderChart();
@@ -366,11 +431,11 @@
       if (logs.length > 0) {
         const startDate = new Date(logs[0].date);
         const endDate = new Date();
-        endDate.setDate(endDate.getDate() + 7);
+        endDate.setDate(endDate.getDate() + 7); // 7 Tage in die Zukunft für Prognose
 
         for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
           const dateStr = d.toISOString().split('T')[0];
-          labels.push(dateStr.slice(5));
+          labels.push(d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }));
 
           const log = logs.find(l => l.date === dateStr && l.weight !== null);
           weightData.push(log ? log.weight : null);
@@ -378,9 +443,9 @@
         }
       }
 
-      const serumGradient = ctx.createLinearGradient(0, 0, 0, 200);
-      serumGradient.addColorStop(0, 'rgba(255, 159, 10, 0.45)');
-      serumGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      const orangeGradient = ctx.createLinearGradient(0, 0, 0, 200);
+      orangeGradient.addColorStop(0, 'rgba(255, 159, 10, 0.25)');
+      orangeGradient.addColorStop(1, 'rgba(255, 159, 10, 0)');
 
       chartInstance = new Chart(ctx, {
         type: 'line',
@@ -388,24 +453,25 @@
           labels: labels,
           datasets: [
             {
-              label: 'Gewicht (kg)',
+              label: 'Gewicht',
               data: weightData,
               borderColor: '#0A84FF',
               backgroundColor: '#0A84FF',
-              borderWidth: 3.5,
-              tension: 0.35,
+              borderWidth: 3,
+              tension: 0.3,
               spanGaps: true,
               yAxisID: 'yWeight',
-              pointRadius: 4
+              pointRadius: 4,
+              pointBackgroundColor: '#0A84FF'
             },
             {
-              label: 'Wirkstoff im Blut (mg)',
+              label: 'Blutspiegel',
               data: serumData,
               borderColor: '#FF9F0A',
-              backgroundColor: serumGradient,
-              borderWidth: 2.5,
+              backgroundColor: orangeGradient,
+              borderWidth: 2,
               fill: true,
-              tension: 0.45,
+              tension: 0.4,
               yAxisID: 'ySerum',
               pointRadius: 0
             }
@@ -414,18 +480,23 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
           plugins: { legend: { display: false } },
           scales: {
-            x: { grid: { display: false }, ticks: { color: '#8E8E93', font: { size: 10 } } },
+            x: { 
+              grid: { display: false }, 
+              ticks: { color: '#8E8E93', maxTicksLimit: 7 } 
+            },
             yWeight: {
               type: 'linear', position: 'left',
-              grid: { color: 'rgba(255,255,255,0.06)' },
-              ticks: { color: '#0A84FF', font: { size: 10, weight: '700' } }
+              grid: { color: '#38383A' },
+              ticks: { color: '#0A84FF' }
             },
             ySerum: {
               type: 'linear', position: 'right',
               grid: { display: false },
-              ticks: { color: '#FF9F0A', font: { size: 10, weight: '700' } }
+              ticks: { color: '#FF9F0A' },
+              min: 0
             }
           }
         }
@@ -436,22 +507,25 @@
       const reversedLogs = [...logs].reverse();
       document.getElementById('historyFeed').innerHTML = reversedLogs.map((l, revIndex) => {
         const actualIndex = logs.length - 1 - revIndex;
+        const displayDate = new Date(l.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        
         return `
           <div class="history-item">
             <div>
-              <div style="font-size:15px; font-weight:800;">${l.weight ? l.weight + ' kg' : 'Spritzen-Dosis'}</div>
-              <div style="font-size:11px; color:var(--sub); margin-top:2px;">${l.date}</div>
+              <div class="history-main">${l.weight ? l.weight + ' kg' : 'Nur Dosis'}</div>
+              <div class="history-sub">${displayDate}</div>
             </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              ${l.dose ? `<span class="pill-dose-tag">💉 ${l.dose} mg</span>` : ''}
-              <button class="btn-delete" onclick="deleteLogEntry(${actualIndex})">🗑️</button>
+            <div style="display:flex; align-items:center; gap:12px;">
+              ${l.dose > 0 ? `<span class="pill">${l.dose} mg</span>` : ''}
+              <button class="btn-delete" onclick="deleteLogEntry(${actualIndex})">Löschen</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    renderUI();
+    // App Starten
+    initApp();
   </script>
 </body>
 </html>
