@@ -14,7 +14,6 @@
       --surface-elevated: rgba(44, 44, 46, 0.9);
       --separator: rgba(255, 255, 255, 0.12);
       
-      /* Frische, edle Pastellfarben */
       --accent-primary: #34D399; /* Frisches Pastell-Mint */
       --accent-gold: #FCD34D;    /* Sanftes Pastell-Gold / Amber */
       --accent-purple: #C084FC;  /* Elegantes Pastell-Lavender */
@@ -33,6 +32,16 @@
       padding: calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 110px) 20px;
       max-width: 540px; margin: 0 auto;
       -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    #appContent {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ===== HEADER BAR ===== */
@@ -121,13 +130,15 @@
       direction: rtl;
     }
     
-    /* Perfekte Rechtsbündigkeit für das Datumsfeld */
+    /* Datum komplett nach rechts an den Rand gezogen */
     input[type="date"].ios-input {
       appearance: none;
       -webkit-appearance: none;
       direction: ltr;
       text-align: right;
       width: 100%;
+      padding-right: 0;
+      margin-right: -2px; /* Zieht das iOS-Inbux-Padding perfekt bündig */
     }
 
     .ios-input::placeholder { color: #555; }
@@ -210,6 +221,7 @@
       display: none; 
       opacity: 0;
       transform: translateY(12px);
+      flex: 1;
     }
     .view-section.active { 
       display: block; 
@@ -396,8 +408,8 @@
 
 
   <script>
-    const STORAGE_KEY = 'glptracker_data_v14';
-    const CONFIG_KEY = 'glptracker_config_v14';
+    const STORAGE_KEY = 'glptracker_data_v15';
+    const CONFIG_KEY = 'glptracker_config_v15';
     
     let logs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || { halfLife: 6 }; 
