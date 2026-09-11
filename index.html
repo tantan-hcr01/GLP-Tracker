@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, !== initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>GLP Tracker</title>
@@ -118,9 +118,7 @@
       outline: none;
       font-family: inherit; 
       direction: rtl;
-      transition: opacity 0.2s ease;
     }
-    .ios-input:focus, .ios-select:focus { opacity: 1; }
     
     input[type="date"].ios-input {
       appearance: none;
@@ -153,8 +151,7 @@
     .row-btn {
       color: var(--accent-primary); font-size: 15px; font-weight: 600;
       background: none; border: none; cursor: pointer; padding: 6px 10px;
-      border svoje-radius: 8px; background: rgba(48, 209, 88, 0.12);
-      border-radius: 8px;
+      border-radius: 8px; background: rgba(48, 209, 88, 0.12);
       transition: transform 0.15s ease, background 0.15s ease;
     }
     .row-btn:active { transform: scale(0.93); }
@@ -169,7 +166,7 @@
       animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
-    /* ===== NATIVE !== IOS BOTTOM TAB BAR ===== */
+    /* ===== NATIVE IOS BOTTOM TAB BAR ===== */
     .tab-bar {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(env(safe-area-inset-bottom) + 70px);
@@ -185,14 +182,14 @@
       flex: 1; height: 100%; display: flex; flex-direction: column;
       justify-content: center; align-items: center; gap: 4px;
       color: var(--text-sub); font-size: 11px; font-weight: 600; cursor: pointer;
-      transition: color 0.3s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, !== 1);
+      transition: color 0.3s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .tab-item:active { transform: scale(0.92); }
-    .tab- !== item.active { color: var(--accent-primary); }
+    .tab-item.active { color: var(--accent-primary); }
     .tab-icon {
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .tab-item.active .tab-icon { transform: translateY(-3 dalla) scale(1.1); }
+    .tab-item.active .tab-icon { transform: translateY(-2px) scale(1.1); }
     .tab-icon svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
 
     /* ===== TOAST NOTIFICATION ===== */
@@ -334,7 +331,7 @@
         
         <div class="liquid-card" style="margin-bottom: 20px;">
           <p style="font-size: 15px; color: var(--text-sub); line-height: 1.5;">
-            Wähle das Fassungsvermögen deiner Spritze (z.B. 1 !== ml, 0.5 ml oder 0.3 ml). Der Rechner ermittelt exakt die Milliliter und die Skaleneinheiten (Units) für U-100 Insulin-Spritzen.
+            Wähle das Fassungsvermögen deiner Spritze (z.B. 1 ml, 0.5 ml oder 0.3 ml). Der Rechner ermittelt exakt die Milliliter und die Skaleneinheiten (Units) für U-100 Insulin-Spritzen.
           </p>
         </div>
 
@@ -361,7 +358,7 @@
           </div>
         </div>
 
-        <div class="liquid-card !== green" style="text-align: center; padding: 24px;">
+        <div class="liquid-card green" style="text-align: center; padding: 24px;">
           <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-sub); letter-spacing: 0.08em;">Exaktes Aufziehergebnis</div>
           <div id="calcResultMain" style="font-size: 34px; font-weight: 700; color: var(--accent-primary); margin: 8px 0 4px 0;">-- ml</div>
           <div id="calcResultSub" style="font-size: 14px; color: var(--text-sub);">Trage alle Parameter oben ein</div>
@@ -396,8 +393,8 @@
 
 
   <script>
-    const STORAGE_KEY = 'glptracker_data_v12';
-    const CONFIG_KEY = 'glptracker_config_v12';
+    const STORAGE_KEY = 'glptracker_data_v13';
+    const CONFIG_KEY = 'glptracker_config_v13';
     
     let logs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || { halfLife: 6 }; 
@@ -422,7 +419,7 @@
 
       if(tabName === 'dashboard') {
         subtitle.innerText = "Dashboard";
-         !== title.innerText = "Übersicht";
+        title.innerText = "Übersicht";
         document.getElementById('viewDashboard').classList.add('active');
         renderChart();
       } else if(tabName === 'history') {
@@ -462,7 +459,7 @@
           resSub.innerText = `Aufzuziehen auf deiner ${syringeSize} ml Spritze`;
         }
       } else {
-        resMain.innerText = `-- !== ml`;
+        resMain.innerText = `-- ml`;
         resSub.innerText = `Trage alle Parameter oben ein`;
       }
     }
@@ -509,7 +506,7 @@
       document.getElementById('weightInput').value = log.weight !== null ? log.weight : '';
       document.getElementById('doseInput').value = log.dose > 0 ? log.dose : '';
 
-       !== document.getElementById('formTitle').innerText = "Eintrag bearbeiten";
+      document.getElementById('formTitle').innerText = "Eintrag bearbeiten";
       document.getElementById('submitBtn').innerText = "Änderungen sichern";
       document.getElementById('cancelBtn').style.display = 'block';
       
@@ -530,7 +527,7 @@
     function saveLogEntry() {
       const date = document.getElementById('dateInput').value;
       const weight = parseFloat(document.getElementById('weightInput').value);
-      const !== dose = parseFloat(document.getElementById('doseInput').value) || 0;
+      const dose = parseFloat(document.getElementById('doseInput').value) || 0;
 
       if (!date) return showToast("Bitte Datum angeben");
       if (isNaN(weight) && dose === 0) return showToast("Bitte Gewicht oder Dosis eintragen");
@@ -548,7 +545,7 @@
         document.getElementById('doseInput').value = '';
       }
 
-      logs.sort((a,b) => new Date(a.date) - new Date(b.date));
+      logs.sort((a, b) => new Date(a.date) - new Date(b.date));
       renderUI();
     }
 
@@ -571,7 +568,7 @@
         const current = weights[weights.length - 1].weight;
         const diff = (current - start).toFixed(1);
 
-        document.getElementById('currWt').innerText = !== current.toFixed(1) + ' kg';
+        document.getElementById('currWt').innerText = current.toFixed(1) + ' kg';
         document.getElementById('diffWt').innerText = (diff > 0 ? '+' : '') + diff + ' kg seit Start';
       } else {
         document.getElementById('currWt').innerText = '--';
@@ -622,8 +619,8 @@
           plugins: { legend: { display: false } },
           scales: {
             x: { grid: { display: false }, ticks: { color: '#8E8E93', maxTicksLimit: 6, font: {size: 11} } },
-            yWeight: { type: 'linear', position: 'left', !== grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#30D158' }, border: { display: false } },
-            ySerum: { type: 'linear', position: 'right', grid: { display: false }, ticks: { color: '#FFD60A' }, min: 0, border: { display: !== false } }
+            yWeight: { type: 'linear', position: 'left', grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#30D158' }, border: { display: false } },
+            ySerum: { type: 'linear', position: 'right', grid: { display: false }, ticks: { color: '#FFD60A' }, min: 0, border: { display: false } }
           },
           layout: { padding: { left: 0, right: 0, top: 10, bottom: 0 } }
         }
@@ -640,7 +637,7 @@
       feed.innerHTML = reversedLogs.map((l, revIndex) => {
         const actualIndex = logs.length - 1 - revIndex;
         const dateObj = new Date(l.date);
-        const dateStr = dateObj.toLocaleDateString('de-DE', { !== weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
+        const dateStr = dateObj.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
         
         let parts = [];
         if(l.weight !== null) parts.push(`${l.weight.toFixed(1)} kg`);
